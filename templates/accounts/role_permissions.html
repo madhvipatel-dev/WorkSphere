@@ -1,0 +1,301 @@
+{% extends "base.html" %}
+
+{% block title %}Roles & Permissions | WorkSphere{% endblock %}
+
+{% block content %}
+
+<div class="page-content">
+
+    <div class="dashboard-page">
+
+        <div class="dashboard-header">
+
+            <div>
+                <div class="dashboard-section-title">
+                    <i class="fa-solid fa-shield-halved"></i>
+                    Roles & Permissions
+                </div>
+
+                <p class="text-muted mb-0">
+                    Review access levels assigned to Admin, Manager and Employee roles.
+                </p>
+            </div>
+
+            <a
+                href="{% url 'user_management' %}"
+                class="btn btn-outline-secondary"
+            >
+                <i class="fa-solid fa-users-gear me-1"></i>
+                Manage Users
+            </a>
+
+        </div>
+
+
+        <!-- Role Summary -->
+        <div class="dashboard-stat-grid">
+
+            {% for role in role_summary %}
+
+                <div class="dashboard-stat-card">
+
+                    <div>
+
+                        <span class="dashboard-stat-label">
+                            {{ role.label }}
+                        </span>
+
+                        <h3>
+                            {{ role.enabled_permissions }}
+                        </h3>
+
+                        <small class="text-muted">
+                            of {{ role.total_permissions }} permissions
+                        </small>
+
+                    </div>
+
+                    <div class="dashboard-stat-icon">
+
+                        {% if role.key == "admin" %}
+                            <i class="fa-solid fa-user-shield"></i>
+                        {% elif role.key == "manager" %}
+                            <i class="fa-solid fa-user-tie"></i>
+                        {% else %}
+                            <i class="fa-solid fa-user"></i>
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+            {% endfor %}
+
+
+            <div class="dashboard-stat-card">
+
+                <div>
+
+                    <span class="dashboard-stat-label">
+                        Permission Modules
+                    </span>
+
+                    <h3>
+                        {{ permissions|length }}
+                    </h3>
+
+                    <small class="text-muted">
+                        Controlled system areas
+                    </small>
+
+                </div>
+
+                <div class="dashboard-stat-icon">
+                    <i class="fa-solid fa-lock"></i>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Permission Matrix -->
+        <div class="dashboard-panel">
+
+            <div class="mb-4">
+
+                <h5 class="mb-1">
+                    Permission Matrix
+                </h5>
+
+                <small class="text-muted">
+                    Current access configuration for each WorkSphere role.
+                </small>
+
+            </div>
+
+
+            <div class="table-responsive">
+
+                <table class="table align-middle mb-0">
+
+                    <thead>
+
+                        <tr>
+
+                            <th style="min-width:280px;">
+                                Module
+                            </th>
+
+                            <th class="text-center">
+                                <i class="fa-solid fa-user-shield me-1"></i>
+                                Admin
+                            </th>
+
+                            <th class="text-center">
+                                <i class="fa-solid fa-user-tie me-1"></i>
+                                Manager
+                            </th>
+
+                            <th class="text-center">
+                                <i class="fa-solid fa-user me-1"></i>
+                                Employee
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                        {% for permission in permissions %}
+
+                            <tr>
+
+                                <td>
+
+                                    <div class="d-flex align-items-center gap-3">
+
+                                        <div
+                                            class="rounded-circle d-flex align-items-center justify-content-center"
+                                            style="
+                                                width:38px;
+                                                height:38px;
+                                                background:#eef2ff;
+                                                color:#4f46e5;
+                                            "
+                                        >
+
+                                            <i class="{{ permission.icon }}"></i>
+
+                                        </div>
+
+                                        <div>
+
+                                            <div class="fw-semibold">
+                                                {{ permission.label }}
+                                            </div>
+
+                                            <small class="text-muted">
+                                                {{ permission.key }}
+                                            </small>
+
+                                        </div>
+
+                                    </div>
+
+                                </td>
+
+
+                                <td class="text-center">
+
+                                    {% if permission.admin %}
+
+                                        <span class="badge bg-success-subtle text-success">
+                                            <i class="fa-solid fa-check me-1"></i>
+                                            Allowed
+                                        </span>
+
+                                    {% else %}
+
+                                        <span class="badge bg-danger-subtle text-danger">
+                                            <i class="fa-solid fa-xmark me-1"></i>
+                                            Denied
+                                        </span>
+
+                                    {% endif %}
+
+                                </td>
+
+
+                                <td class="text-center">
+
+                                    {% if permission.manager %}
+
+                                        <span class="badge bg-success-subtle text-success">
+                                            <i class="fa-solid fa-check me-1"></i>
+                                            Allowed
+                                        </span>
+
+                                    {% else %}
+
+                                        <span class="badge bg-danger-subtle text-danger">
+                                            <i class="fa-solid fa-xmark me-1"></i>
+                                            Denied
+                                        </span>
+
+                                    {% endif %}
+
+                                </td>
+
+
+                                <td class="text-center">
+
+                                    {% if permission.employee %}
+
+                                        <span class="badge bg-success-subtle text-success">
+                                            <i class="fa-solid fa-check me-1"></i>
+                                            Allowed
+                                        </span>
+
+                                    {% else %}
+
+                                        <span class="badge bg-danger-subtle text-danger">
+                                            <i class="fa-solid fa-xmark me-1"></i>
+                                            Denied
+                                        </span>
+
+                                    {% endif %}
+
+                                </td>
+
+                            </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+
+        <!-- Information -->
+        <div class="dashboard-panel mt-4">
+
+            <div class="d-flex gap-3">
+
+                <div
+                    class="text-primary"
+                    style="font-size:24px;"
+                >
+                    <i class="fa-solid fa-circle-info"></i>
+                </div>
+
+                <div>
+
+                    <h6>
+                        About Roles & Permissions
+                    </h6>
+
+                    <p class="text-muted small mb-0">
+                        Admin has full system access. Managers can manage
+                        operational areas such as projects, tasks, meetings,
+                        files and reports. Employees receive access to the
+                        features required for their assigned work.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

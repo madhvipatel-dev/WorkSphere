@@ -1,0 +1,432 @@
+{% extends "base.html" %}
+
+{% block title %}My Profile | WorkSphere{% endblock %}
+
+{% block content %}
+
+<div class="page-content">
+
+    <div class="dashboard-page">
+
+        <!-- Page Header -->
+        <div class="dashboard-header">
+
+            <div>
+                <div class="dashboard-section-title">
+                    <i class="fa-solid fa-user-circle"></i>
+                    My Profile
+                </div>
+
+                <p class="text-muted mb-0">
+                    View and manage your personal WorkSphere information.
+                </p>
+            </div>
+
+            <a
+                href="{% url 'dashboard' %}"
+                class="btn btn-outline-secondary"
+            >
+                <i class="fa-solid fa-arrow-left me-1"></i>
+                Back to Dashboard
+            </a>
+
+        </div>
+
+
+        <!-- Profile Layout -->
+        <div
+            style="
+                display:grid;
+                grid-template-columns:300px minmax(0,1fr);
+                gap:20px;
+                align-items:start;
+            "
+        >
+
+            <!-- Profile Summary -->
+            <div class="dashboard-panel">
+
+                <div
+                    class="text-center"
+                    style="padding:15px 5px 10px;"
+                >
+
+                    <div
+                        style="
+                            width:90px;
+                            height:90px;
+                            margin:0 auto 18px;
+                            border-radius:50%;
+                            display:flex;
+                            align-items:center;
+                            justify-content:center;
+                            background:#4f46e5;
+                            color:white;
+                            font-size:32px;
+                            font-weight:700;
+                        "
+                    >
+                        {{ request.user.username|first|upper }}
+                    </div>
+
+                    <h5 class="mb-1">
+                        {% if request.user.get_full_name %}
+                            {{ request.user.get_full_name }}
+                        {% else %}
+                            {{ request.user.username }}
+                        {% endif %}
+                    </h5>
+
+                    <p class="text-muted mb-3">
+                        @{{ request.user.username }}
+                    </p>
+
+
+                    {% if profile.role == "admin" %}
+
+                        <span class="badge bg-primary-subtle text-primary">
+                            <i class="fa-solid fa-user-shield me-1"></i>
+                            Administrator
+                        </span>
+
+                    {% elif profile.role == "manager" %}
+
+                        <span class="badge bg-warning-subtle text-warning">
+                            <i class="fa-solid fa-user-tie me-1"></i>
+                            Manager
+                        </span>
+
+                    {% else %}
+
+                        <span class="badge bg-success-subtle text-success">
+                            <i class="fa-solid fa-user me-1"></i>
+                            Employee
+                        </span>
+
+                    {% endif %}
+
+                </div>
+
+
+                <hr>
+
+
+                <div class="small">
+
+                    <div class="d-flex justify-content-between mb-3">
+                        <span class="text-muted">
+                            Account Status
+                        </span>
+
+                        {% if request.user.is_active %}
+
+                            <span class="text-success fw-semibold">
+                                <i class="fa-solid fa-circle-check me-1"></i>
+                                Active
+                            </span>
+
+                        {% else %}
+
+                            <span class="text-danger fw-semibold">
+                                <i class="fa-solid fa-circle-xmark me-1"></i>
+                                Inactive
+                            </span>
+
+                        {% endif %}
+
+                    </div>
+
+
+                    <div class="d-flex justify-content-between mb-3">
+
+                        <span class="text-muted">
+                            Department
+                        </span>
+
+                        <span class="fw-semibold text-end">
+
+                            {% if profile.department %}
+                                {{ profile.department.name }}
+                            {% else %}
+                                Not assigned
+                            {% endif %}
+
+                        </span>
+
+                    </div>
+
+
+                    <div class="d-flex justify-content-between">
+
+                        <span class="text-muted">
+                            Job Title
+                        </span>
+
+                        <span class="fw-semibold text-end">
+
+                            {% if profile.job_title %}
+                                {{ profile.job_title }}
+                            {% else %}
+                                Not specified
+                            {% endif %}
+
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- Profile Form -->
+            <div class="dashboard-panel">
+
+                <div class="mb-4">
+
+                    <h5 class="mb-1">
+                        Personal Information
+                    </h5>
+
+                    <small class="text-muted">
+                        Update the information associated with your account.
+                    </small>
+
+                </div>
+
+
+                <form method="post">
+
+                    {% csrf_token %}
+
+
+                    <div class="row g-3">
+
+                        <!-- First Name -->
+                        <div class="col-md-6">
+
+                            <label
+                                for="first_name"
+                                class="form-label fw-semibold"
+                            >
+                                First Name
+                            </label>
+
+                            <input
+                                type="text"
+                                id="first_name"
+                                name="first_name"
+                                class="form-control"
+                                value="{{ request.user.first_name }}"
+                                placeholder="Enter your first name"
+                            >
+
+                        </div>
+
+
+                        <!-- Last Name -->
+                        <div class="col-md-6">
+
+                            <label
+                                for="last_name"
+                                class="form-label fw-semibold"
+                            >
+                                Last Name
+                            </label>
+
+                            <input
+                                type="text"
+                                id="last_name"
+                                name="last_name"
+                                class="form-control"
+                                value="{{ request.user.last_name }}"
+                                placeholder="Enter your last name"
+                            >
+
+                        </div>
+
+
+                        <!-- Username -->
+                        <div class="col-md-6">
+
+                            <label
+                                class="form-label fw-semibold"
+                            >
+                                Username
+                            </label>
+
+                            <input
+                                type="text"
+                                class="form-control"
+                                value="{{ request.user.username }}"
+                                disabled
+                            >
+
+                            <small class="text-muted">
+                                Username cannot be changed here.
+                            </small>
+
+                        </div>
+
+
+                        <!-- Email -->
+                        <div class="col-md-6">
+
+                            <label
+                                for="email"
+                                class="form-label fw-semibold"
+                            >
+                                Email Address
+                            </label>
+
+                            <input
+                                type="email"
+                                id="email"
+                                name="email"
+                                class="form-control"
+                                value="{{ request.user.email }}"
+                                placeholder="Enter your email"
+                                required
+                            >
+
+                        </div>
+
+
+                        <!-- Phone -->
+                        <div class="col-md-6">
+
+                            <label
+                                for="phone"
+                                class="form-label fw-semibold"
+                            >
+                                Phone Number
+                            </label>
+
+                            <input
+                                type="text"
+                                id="phone"
+                                name="phone"
+                                class="form-control"
+                                value="{{ profile.phone }}"
+                                placeholder="Enter your phone number"
+                            >
+
+                        </div>
+
+
+                        <!-- Job Title -->
+                        <div class="col-md-6">
+
+                            <label
+                                for="job_title"
+                                class="form-label fw-semibold"
+                            >
+                                Job Title
+                            </label>
+
+                            <input
+                                type="text"
+                                id="job_title"
+                                name="job_title"
+                                class="form-control"
+                                value="{{ profile.job_title }}"
+                                placeholder="e.g. Software Developer"
+                            >
+
+                        </div>
+
+
+                        <!-- Department -->
+                        <div class="col-md-6">
+
+                            <label
+                                class="form-label fw-semibold"
+                            >
+                                Department
+                            </label>
+
+                            <input
+                                type="text"
+                                class="form-control"
+                                value="{% if profile.department %}{{ profile.department.name }}{% else %}Not assigned{% endif %}"
+                                disabled
+                            >
+
+                            <small class="text-muted">
+                                Department is managed by an administrator.
+                            </small>
+
+                        </div>
+
+
+                        <!-- Role -->
+                        <div class="col-md-6">
+
+                            <label
+                                class="form-label fw-semibold"
+                            >
+                                Role
+                            </label>
+
+                            <input
+                                type="text"
+                                class="form-control"
+                                value="{{ profile.get_role_display }}"
+                                disabled
+                            >
+
+                            <small class="text-muted">
+                                Your role is managed by an administrator.
+                            </small>
+
+                        </div>
+
+                    </div>
+
+
+                    <hr class="my-4">
+
+
+                    <div class="d-flex justify-content-end gap-2">
+
+                        <a
+                            href="{% url 'dashboard' %}"
+                            class="btn btn-light border"
+                        >
+                            Cancel
+                        </a>
+
+                        <button
+                            type="submit"
+                            class="btn btn-primary"
+                        >
+                            <i class="fa-solid fa-floppy-disk me-1"></i>
+                            Save Changes
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<style>
+
+@media (max-width: 900px) {
+
+    .dashboard-page > div[style*="grid-template-columns"] {
+        grid-template-columns: 1fr !important;
+    }
+
+}
+
+</style>
+
+{% endblock %}

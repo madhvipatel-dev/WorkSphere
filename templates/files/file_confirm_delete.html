@@ -1,0 +1,386 @@
+
+{% extends "base.html" %}
+
+{% block title %}Delete File | WorkSphere{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid py-4">
+
+    <!-- ================================================== -->
+    <!-- PAGE HEADER -->
+    <!-- ================================================== -->
+
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+
+        <div>
+
+            <nav aria-label="breadcrumb">
+
+                <ol class="breadcrumb mb-2">
+
+                    <li class="breadcrumb-item">
+                        <a href="{% url 'file_list' %}"
+                           class="text-decoration-none">
+                            Files
+                        </a>
+                    </li>
+
+                    <li class="breadcrumb-item">
+                        <a href="{% url 'file_detail' project_file.id %}"
+                           class="text-decoration-none">
+                            File Details
+                        </a>
+                    </li>
+
+                    <li class="breadcrumb-item active"
+                        aria-current="page">
+                        Delete File
+                    </li>
+
+                </ol>
+
+            </nav>
+
+            <h2 class="fw-bold mb-1">
+
+                <i class="fa-solid fa-trash-can text-danger me-2"></i>
+                Delete File
+
+            </h2>
+
+            <p class="text-muted mb-0">
+                Review the file details before confirming deletion.
+            </p>
+
+        </div>
+
+        <a href="{% url 'file_detail' project_file.id %}"
+           class="btn btn-outline-secondary">
+
+            <i class="fa-solid fa-arrow-left me-2"></i>
+            Back to File
+
+        </a>
+
+    </div>
+
+
+    <!-- ================================================== -->
+    <!-- DELETE CONFIRMATION -->
+    <!-- ================================================== -->
+
+    <div class="row justify-content-center">
+
+        <div class="col-lg-7 col-xl-6">
+
+            <div class="card border-0 shadow-sm overflow-hidden">
+
+                <div class="card-body p-4 p-md-5">
+
+                    <!-- WARNING ICON -->
+
+                    <div class="text-center mb-4">
+
+                        <div
+                            class="rounded-circle bg-danger bg-opacity-10 d-inline-flex align-items-center justify-content-center mb-3"
+                            style="width: 86px; height: 86px;"
+                        >
+
+                            <i class="fa-solid fa-trash-can text-danger fs-2"></i>
+
+                        </div>
+
+                        <h3 class="fw-bold mb-2">
+                            Delete This File?
+                        </h3>
+
+                        <p class="text-muted mb-0">
+                            You are about to remove a document from WorkSphere.
+                        </p>
+
+                    </div>
+
+
+                    <!-- ================================== -->
+                    <!-- FILE INFORMATION -->
+                    <!-- ================================== -->
+
+                    <div class="border rounded-3 p-3 p-md-4 mb-4">
+
+                        <div class="d-flex align-items-start gap-3 mb-3">
+
+                            <div class="rounded-3 bg-primary bg-opacity-10 p-3">
+
+                                <i class="fa-solid fa-file-lines text-primary fs-4"></i>
+
+                            </div>
+
+                            <div class="flex-grow-1">
+
+                                <div class="text-muted small mb-1">
+                                    File Title
+                                </div>
+
+                                <h5 class="fw-bold mb-1 text-break">
+                                    {{ project_file.title }}
+                                </h5>
+
+                                {% if project_file.description %}
+
+                                <p class="text-muted small mb-0">
+                                    {{ project_file.description|truncatechars:150 }}
+                                </p>
+
+                                {% endif %}
+
+                            </div>
+
+                        </div>
+
+                        <hr>
+
+                        <div class="row g-3">
+
+                            <!-- PROJECT -->
+
+                            <div class="col-sm-6">
+
+                                <div class="text-muted small mb-1">
+                                    <i class="fa-solid fa-folder me-1"></i>
+                                    Project
+                                </div>
+
+                                <div class="fw-semibold text-break">
+                                    {{ project_file.project.name }}
+                                </div>
+
+                            </div>
+
+
+                            <!-- UPLOADED BY -->
+
+                            <div class="col-sm-6">
+
+                                <div class="text-muted small mb-1">
+                                    <i class="fa-solid fa-user me-1"></i>
+                                    Uploaded By
+                                </div>
+
+                                <div class="fw-semibold">
+                                    {{ project_file.uploaded_by.username }}
+                                </div>
+
+                            </div>
+
+
+                            <!-- UPLOAD DATE -->
+
+                            <div class="col-sm-6">
+
+                                <div class="text-muted small mb-1">
+                                    <i class="fa-solid fa-calendar me-1"></i>
+                                    Uploaded On
+                                </div>
+
+                                <div class="fw-semibold">
+                                    {{ project_file.uploaded_at|date:"d M Y" }}
+                                </div>
+
+                            </div>
+
+
+                            <!-- LAST UPDATED -->
+
+                            <div class="col-sm-6">
+
+                                <div class="text-muted small mb-1">
+                                    <i class="fa-solid fa-clock me-1"></i>
+                                    Last Updated
+                                </div>
+
+                                <div class="fw-semibold">
+                                    {{ project_file.updated_at|date:"d M Y" }}
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- ================================== -->
+                    <!-- WARNING -->
+                    <!-- ================================== -->
+
+                    <div class="alert alert-danger border-0 mb-4"
+                         role="alert">
+
+                        <div class="d-flex align-items-start">
+
+                            <i class="fa-solid fa-triangle-exclamation fs-5 me-3 mt-1"></i>
+
+                            <div>
+
+                                <h6 class="fw-bold mb-2">
+                                    Important Warning
+                                </h6>
+
+                                <p class="mb-2 small">
+                                    Deleting this file will remove its record
+                                    from WorkSphere and make it unavailable
+                                    through the File Management module.
+                                </p>
+
+                                <p class="mb-0 small">
+                                    The associated stored file is also
+                                    scheduled for deletion. This action
+                                    cannot be undone through WorkSphere.
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- ================================== -->
+                    <!-- PERMISSION INFORMATION -->
+                    <!-- ================================== -->
+
+                    {% if can_delete_file %}
+
+                    <div class="alert alert-light border mb-4">
+
+                        <i class="fa-solid fa-shield-halved text-primary me-2"></i>
+
+                        <span class="small">
+                            You are authorized to delete this project file.
+                        </span>
+
+                    </div>
+
+
+                    <!-- ================================== -->
+                    <!-- CONFIRMATION FORM -->
+                    <!-- ================================== -->
+
+                    <form method="post"
+                          id="deleteFileForm">
+
+                        {% csrf_token %}
+
+                        <div class="d-flex flex-wrap justify-content-center gap-3">
+
+                            <a
+                                href="{% url 'file_detail' project_file.id %}"
+                                class="btn btn-outline-secondary px-4"
+                            >
+
+                                <i class="fa-solid fa-xmark me-2"></i>
+                                Cancel
+
+                            </a>
+
+
+                            <button
+                                type="submit"
+                                id="confirmDeleteButton"
+                                class="btn btn-danger px-4"
+                            >
+
+                                <i class="fa-solid fa-trash-can me-2"></i>
+                                Yes, Delete File
+
+                            </button>
+
+                        </div>
+
+                    </form>
+
+                    {% else %}
+
+                    <div class="alert alert-warning"
+                         role="alert">
+
+                        <i class="fa-solid fa-lock me-2"></i>
+                        You do not have permission to delete this file.
+
+                    </div>
+
+                    <div class="text-center">
+
+                        <a
+                            href="{% url 'file_detail' project_file.id %}"
+                            class="btn btn-outline-secondary"
+                        >
+
+                            <i class="fa-solid fa-arrow-left me-2"></i>
+                            Return to File Details
+
+                        </a>
+
+                    </div>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+
+            <!-- ========================================== -->
+            <!-- FOOTER NOTE -->
+            <!-- ========================================== -->
+
+            <p class="text-center text-muted small mt-3">
+
+                <i class="fa-solid fa-circle-info me-1"></i>
+
+                If you need to keep this document,
+                download a copy before deleting it.
+
+            </p>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ====================================================== -->
+<!-- PREVENT ACCIDENTAL DOUBLE SUBMISSION -->
+<!-- ====================================================== -->
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const deleteForm = document.getElementById(
+        "deleteFileForm"
+    );
+
+    const deleteButton = document.getElementById(
+        "confirmDeleteButton"
+    );
+
+    if (!deleteForm || !deleteButton) {
+        return;
+    }
+
+    deleteForm.addEventListener("submit", function () {
+
+        deleteButton.disabled = true;
+
+        deleteButton.innerHTML =
+            '<i class="fa-solid fa-spinner fa-spin me-2"></i>' +
+            'Deleting...';
+
+    });
+
+});
+</script>
+
+{% endblock %}

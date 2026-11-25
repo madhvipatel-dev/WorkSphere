@@ -1,0 +1,472 @@
+
+{% extends "base.html" %}
+
+{% block content %}
+
+<style>
+.chat-page {
+    max-width: 1000px;
+    margin: 20px auto;
+    padding: 0 16px;
+    color: var(--text-color, inherit);
+}
+
+.chat-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.chat-subtitle {
+    color: #777;
+    margin-top: 5px;
+}
+
+.chat-status {
+    color: #16834a;
+    font-size: 13px;
+}
+
+.chat-window {
+    height: 460px;
+    overflow-y: auto;
+    padding: 20px;
+    border: 1px solid #e1e5eb;
+    border-radius: 14px;
+    background: #f7f9fc;
+}
+
+.chat-message {
+    display: flex;
+    margin-bottom: 18px;
+    gap: 10px;
+    align-items: flex-start;
+}
+
+.chat-message.mine {
+    flex-direction: row-reverse;
+}
+
+.chat-avatar {
+    flex: 0 0 36px;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #dce8ff;
+    color: #2457a7;
+    font-weight: 700;
+}
+
+.chat-message.mine .chat-avatar {
+    background: #d9f3e4;
+    color: #167443;
+}
+
+.chat-body {
+    max-width: 78%;
+    min-width: 0;
+}
+
+.chat-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    font-size: 12px;
+    color: #687386;
+    margin: 0 4px 5px;
+}
+
+.chat-message.mine .chat-meta {
+    justify-content: flex-end;
+}
+
+.chat-bubble {
+    padding: 11px 14px;
+    border-radius: 4px 14px 14px 14px;
+    background: #fff;
+    border: 1px solid #e4e8ef;
+    overflow-wrap: anywhere;
+    white-space: pre-wrap;
+    line-height: 1.5;
+}
+
+.chat-message.mine .chat-bubble {
+    background: #dceafe;
+    border-color: #cbdcff;
+    border-radius: 14px 4px 14px 14px;
+}
+
+.chat-empty {
+    text-align: center;
+    color: #778196;
+    padding: 100px 10px;
+}
+
+.chat-form {
+    display: flex;
+    gap: 10px;
+    margin-top: 14px;
+}
+
+.chat-form textarea {
+    flex: 1;
+    min-width: 0;
+    resize: vertical;
+    min-height: 48px;
+    max-height: 120px;
+    padding: 13px;
+    border: 1px solid #d7dce5;
+    border-radius: 12px;
+    font: inherit;
+    background: var(--input-bg, #fff);
+    color: inherit;
+}
+
+.chat-form button {
+    padding: 0 22px;
+    border: 0;
+    border-radius: 12px;
+    background: #2563eb;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.chat-form button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.chat-help {
+    color: #778196;
+    font-size: 12px;
+    margin-top: 8px;
+}
+
+@media (max-width: 600px) {
+    .chat-window {
+        height: 55vh;
+        min-height: 320px;
+        padding: 12px;
+    }
+
+    .chat-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .chat-body {
+        max-width: 85%;
+    }
+
+    .chat-form button {
+        padding: 0 14px;
+    }
+}
+</style>
+
+<div class="chat-page">
+
+    <!-- Header -->
+    <div class="chat-header">
+
+        <div>
+            <h1>Team Discussions</h1>
+
+            <p class="chat-subtitle">
+                Share updates and communicate with your WorkSphere team.
+            </p>
+        </div>
+
+        <span class="chat-status" id="chat-status">
+            <span aria-hidden="true">●</span> Chat available
+        </span>
+
+    </div>
+
+    <!-- Chat Window -->
+    <div
+        class="chat-window"
+        id="chat-window"
+        aria-label="Team chat messages"
+        aria-live="polite"
+    >
+
+        <div
+            id="empty-message"
+            class="chat-empty"
+            {% if messages %}hidden{% endif %}
+        >
+            <h3>No messages yet</h3>
+            <p>Start the conversation with your team!</p>
+        </div>
+
+        <div id="chat-messages">
+
+            {% for item in messages %}
+
+                <div
+                    class="chat-message {% if item.author_id == request.user.id %}mine{% endif %}"
+                    data-message-id="{{ item.id }}"
+                >
+
+                    <div class="chat-avatar">
+
+                        {% if item.author.get_full_name %}
+                            {{ item.author.get_full_name|first|upper }}
+                        {% else %}
+                            {{ item.author.username|first|upper }}
+                        {% endif %}
+
+                    </div>
+
+                    <div class="chat-body">
+
+                        <div class="chat-meta">
+
+                            <strong>
+                                {% if item.author.get_full_name %}
+                                    {{ item.author.get_full_name }}
+                                {% else %}
+                                    {{ item.author.username }}
+                                {% endif %}
+                            </strong>
+
+                            <span>
+                                {{ item.created_at|date:"d M Y, h:i A" }}
+                            </span>
+
+                        </div>
+
+                        <div class="chat-bubble">{{ item.message }}</div>
+
+                    </div>
+
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+    </div>
+
+    <!-- Message Form -->
+    <form
+        class="chat-form"
+        method="post"
+        action="{% url 'ws_discussions:send_message' %}"
+        id="chat-form"
+    >
+
+        {% csrf_token %}
+
+        <textarea
+            id="chat-input"
+            name="message"
+            placeholder="Type a message..."
+            maxlength="2000"
+            rows="1"
+            required
+            aria-label="Your message"
+        ></textarea>
+
+        <button type="submit" id="send-button">
+            Send ➤
+        </button>
+
+    </form>
+
+    <p class="chat-help">
+        Press Enter to send. Use Shift + Enter for a new line.
+        Messages refresh automatically.
+    </p>
+
+</div>
+
+<script>
+(function () {
+
+    const windowElement = document.getElementById("chat-window");
+    const messagesElement = document.getElementById("chat-messages");
+    const emptyElement = document.getElementById("empty-message");
+    const input = document.getElementById("chat-input");
+    const form = document.getElementById("chat-form");
+    const button = document.getElementById("send-button");
+    const status = document.getElementById("chat-status");
+
+    const messagesUrl = "{% url 'ws_discussions:messages_json' %}";
+
+    let isRefreshing = false;
+    let isSending = false;
+
+    function scrollToBottom() {
+        windowElement.scrollTop = windowElement.scrollHeight;
+    }
+
+    function isNearBottom() {
+        return (
+            windowElement.scrollHeight -
+            windowElement.scrollTop -
+            windowElement.clientHeight < 100
+        );
+    }
+
+    function addMessage(item) {
+
+        const id = String(item.id);
+
+        // Prevent duplicate messages.
+        if (
+            messagesElement.querySelector(
+                '[data-message-id="' + id + '"]'
+            )
+        ) {
+            return false;
+        }
+
+        const row = document.createElement("div");
+
+        row.className = "chat-message" +
+            (item.is_mine ? " mine" : "");
+
+        row.dataset.messageId = id;
+
+        const avatar = document.createElement("div");
+        avatar.className = "chat-avatar";
+        avatar.textContent = (item.author || "?").charAt(0).toUpperCase();
+
+        const body = document.createElement("div");
+        body.className = "chat-body";
+
+        const meta = document.createElement("div");
+        meta.className = "chat-meta";
+
+        const author = document.createElement("strong");
+        author.textContent = item.author;
+
+        const time = document.createElement("span");
+        time.textContent = item.created_at;
+
+        meta.append(author, time);
+
+        const bubble = document.createElement("div");
+        bubble.className = "chat-bubble";
+        bubble.textContent = item.message;
+
+        body.append(meta, bubble);
+        row.append(avatar, body);
+
+        messagesElement.appendChild(row);
+
+        return true;
+    }
+
+    async function refreshMessages() {
+
+        if (isRefreshing) {
+            return;
+        }
+
+        isRefreshing = true;
+
+        try {
+
+            const response = await fetch(messagesUrl, {
+                headers: {
+                    "X-Requested-With": "XMLHttpRequest"
+                },
+                credentials: "same-origin"
+            });
+
+            if (response.status === 401 || response.redirected) {
+                status.textContent = "Please log in again.";
+                return;
+            }
+
+            if (!response.ok) {
+                throw new Error("Could not load messages");
+            }
+
+            const data = await response.json();
+
+            const shouldScroll = isNearBottom();
+            let added = false;
+
+            data.messages.forEach(function (item) {
+
+                if (addMessage(item)) {
+                    added = true;
+                }
+
+            });
+
+            emptyElement.hidden =
+                messagesElement.children.length > 0;
+
+            if (added && shouldScroll) {
+                scrollToBottom();
+            }
+
+            status.textContent = "● Chat available";
+
+        } catch (error) {
+
+            status.textContent = "Connection issue — retrying...";
+
+            console.error("Chat refresh error:", error);
+
+        } finally {
+
+            isRefreshing = false;
+
+        }
+    }
+
+    // Prevent empty message submission.
+    form.addEventListener("submit", function (event) {
+
+        if (!input.value.trim() || isSending) {
+            event.preventDefault();
+            return;
+        }
+
+        isSending = true;
+        button.disabled = true;
+        button.textContent = "Sending...";
+
+    });
+
+    // Enter sends; Shift + Enter adds a new line.
+    input.addEventListener("keydown", function (event) {
+
+        if (
+            event.key === "Enter" &&
+            !event.shiftKey &&
+            !event.isComposing
+        ) {
+
+            event.preventDefault();
+
+            if (input.value.trim() && !isSending) {
+                form.requestSubmit();
+            }
+
+        }
+
+    });
+
+    scrollToBottom();
+
+    refreshMessages();
+
+    window.setInterval(refreshMessages, 3000);
+
+})();
+</script>
+
+{% endblock %}

@@ -1,0 +1,39 @@
+# Virtual environment
+venv/
+.venv/
+env/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Django database
+db.sqlite3
+*.sqlite3
+
+# Sensitive information
+.env
+.env.*
+!.env.example
+
+# Uploaded files
+media/
+
+# Generated static files
+staticfiles/
+
+# IDE settings
+.vscode/
+.idea/
+
+# Logs
+*.log
+
+# Operating system files
+.DS_Store
+Thumbs.db
+
+# Backup files
+*.zip
+*.backup

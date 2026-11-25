@@ -1,0 +1,407 @@
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#10152b">
+
+    <title>Sign in | WorkSphere</title>
+
+    <link rel="stylesheet"
+          href="{% static 'css/auth.css' %}">
+
+    <style>
+        /* Four-role login grid */
+        .login-role-field .role-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
+        }
+
+        .login-role-field .role-option {
+            min-width: 0;
+            cursor: pointer;
+        }
+
+        .login-role-field .role-card {
+            box-sizing: border-box;
+            width: 100%;
+            min-height: 125px;
+        }
+
+        .login-role-field .role-option input:checked
+        + .role-card {
+            border-color: #7954f5;
+            background: #f7f4ff;
+        }
+
+        .login-role-field .client-icon {
+            background: #fff1e6;
+            color: #ea7a25;
+        }
+
+        .login-role-field .client-icon svg {
+            width: 24px;
+            height: 24px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 1.8;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        @media (max-width: 380px) {
+            .login-role-field .role-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body class="auth-body">
+
+<div class="auth-layout">
+
+    <!-- LEFT: BRANDING -->
+    <aside class="brand-panel">
+
+        <a class="brand" href="/">
+            <span class="brand-icon">W</span>
+
+            <span>
+                Work<span class="brand-light">Sphere</span>
+            </span>
+        </a>
+
+        <div class="brand-main">
+
+            <div class="brand-pill">
+                <span class="status-dot"></span>
+                YOUR WORKSPACE IS WAITING
+            </div>
+
+            <h1>
+                Welcome back<br>
+                to <span>better work.</span>
+            </h1>
+
+        </div>
+
+    </aside>
+
+    <!-- RIGHT: LOGIN FORM -->
+    <main class="form-panel">
+
+        <section class="auth-card login-card">
+
+            <!-- Django messages -->
+            {% if messages %}
+                {% for message in messages %}
+                    <div
+                        class="notice notice-{{ message.tags|default:'info' }}"
+                        role="status">
+
+                        <span class="notice-icon">✓</span>
+                        <span>{{ message }}</span>
+
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <!-- Authentication errors -->
+            {% if form.non_field_errors %}
+                <div class="form-alert" role="alert">
+                    {{ form.non_field_errors }}
+                </div>
+            {% endif %}
+
+            <form method="post" class="auth-form">
+                {% csrf_token %}
+
+                <header class="form-heading">
+                    <h2>Login</h2>
+                </header>
+
+                <!-- USERNAME -->
+                <div class="field">
+
+                    <label for="{{ form.username.id_for_label }}">
+                        Username
+                    </label>
+
+                    {{ form.username }}
+
+                    {% for error in form.username.errors %}
+                        <small class="field-error">
+                            {{ error }}
+                        </small>
+                    {% endfor %}
+
+                </div>
+
+                <!-- PASSWORD -->
+                <div class="field">
+
+                    <label for="{{ form.password.id_for_label }}">
+                        Password
+                    </label>
+
+                    <div class="password-wrap">
+
+                        {{ form.password }}
+
+                        <button
+                            type="button"
+                            class="password-toggle"
+                            data-password-target="{{ form.password.id_for_label }}"
+                            aria-label="Show password">
+                            Show
+                        </button>
+
+                    </div>
+
+                    {% for error in form.password.errors %}
+                        <small class="field-error">
+                            {{ error }}
+                        </small>
+                    {% endfor %}
+
+                </div>
+
+                <!-- LOGIN ROLE -->
+                <div class="field role-field login-role-field">
+
+                    <div class="role-heading">
+
+                        <label id="login-role-label">
+                            Continue as
+                        </label>
+
+                        <span class="optional-note">
+                            Your assigned role
+                        </span>
+
+                    </div>
+
+                    <div class="role-grid"
+                         role="radiogroup"
+                         aria-labelledby="login-role-label">
+
+                        <!-- ADMIN -->
+                        <label class="role-option">
+
+                            <input
+                                type="radio"
+                                name="login_role"
+                                value="admin"
+                                required
+                                {% if request.POST.login_role == "admin" %}
+                                    checked
+                                {% endif %}>
+
+                            <span class="role-card">
+
+                                <span class="role-icon admin-icon">
+                                    <svg viewBox="0 0 24 24"
+                                         aria-hidden="true">
+                                        <path d="M3 8l5 4 4-7 4 7 5-4-2 11H5L3 8z"/>
+                                        <path d="M6 22h12"/>
+                                    </svg>
+                                </span>
+
+                                <strong>Admin</strong>
+                                <small>Administration</small>
+
+                                <span class="role-radio"></span>
+
+                            </span>
+
+                        </label>
+
+                        <!-- MANAGER -->
+                        <label class="role-option">
+
+                            <input
+                                type="radio"
+                                name="login_role"
+                                value="manager"
+                                required
+                                {% if request.POST.login_role == "manager" %}
+                                    checked
+                                {% endif %}>
+
+                            <span class="role-card">
+
+                                <span class="role-icon manager-icon">
+                                    <svg viewBox="0 0 24 24"
+                                         aria-hidden="true">
+
+                                        <circle cx="9" cy="8" r="3.5"/>
+
+                                        <path d="M2.5 20v-2a6.5 6.5 0 0 1 13 0v2z"/>
+
+                                        <path d="M16 5a3.5 3.5 0 0 1 0 6.8M18 14a5.5 5.5 0 0 1 3.5 5v1"/>
+
+                                    </svg>
+                                </span>
+
+                                <strong>Manager</strong>
+                                <small>Lead a team</small>
+
+                                <span class="role-radio"></span>
+
+                            </span>
+
+                        </label>
+
+                        <!-- EMPLOYEE -->
+                        <label class="role-option">
+
+                            <input
+                                type="radio"
+                                name="login_role"
+                                value="employee"
+                                required
+                                {% if request.POST.login_role == "employee" %}
+                                    checked
+                                {% endif %}>
+
+                            <span class="role-card">
+
+                                <span class="role-icon employee-icon">
+                                    <svg viewBox="0 0 24 24"
+                                         aria-hidden="true">
+
+                                        <circle cx="12" cy="8" r="4"/>
+
+                                        <path d="M4 21v-2a8 8 0 0 1 16 0v2z"/>
+
+                                    </svg>
+                                </span>
+
+                                <strong>Employee</strong>
+                                <small>My workspace</small>
+
+                                <span class="role-radio"></span>
+
+                            </span>
+
+                        </label>
+
+                        <!-- CLIENT / CUSTOMER -->
+                        <label class="role-option">
+
+                            <input
+                                type="radio"
+                                name="login_role"
+                                value="client"
+                                required
+                                {% if request.POST.login_role == "client" %}
+                                    checked
+                                {% endif %}>
+
+                            <span class="role-card">
+
+                                <span class="role-icon client-icon">
+
+                                    <svg viewBox="0 0 24 24"
+                                         aria-hidden="true">
+
+                                        <rect
+                                            x="3"
+                                            y="7"
+                                            width="18"
+                                            height="14"
+                                            rx="2"/>
+
+                                        <path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+
+                                        <path d="M3 13h18"/>
+
+                                    </svg>
+
+                                </span>
+
+                                <strong>Client</strong>
+                                <small>My projects</small>
+
+                                <span class="role-radio"></span>
+
+                            </span>
+
+                        </label>
+
+                    </div>
+
+                </div>
+
+                <!-- LOGIN BUTTON -->
+                <button
+                    type="submit"
+                    class="primary-button">
+
+                    <span>Sign in to WorkSphere</span>
+                    <span class="button-arrow">→</span>
+
+                </button>
+
+            </form>
+
+            <!-- REGISTRATION LINK -->
+            <div class="auth-divider">
+                <span>NEW TO WORKSPHERE?</span>
+            </div>
+
+            <p class="auth-switch">
+
+                Create your own workspace account.
+
+                <a href="{% url 'register' %}">
+                    Get started <span>→</span>
+                </a>
+
+            </p>
+
+        </section>
+
+    </main>
+
+</div>
+
+<!-- PASSWORD SHOW / HIDE -->
+<script>
+document.querySelectorAll(".password-toggle").forEach(
+    function (button) {
+
+        button.addEventListener("click", function () {
+
+            const field = document.getElementById(
+                button.getAttribute("data-password-target")
+            );
+
+            if (!field) {
+                return;
+            }
+
+            const showing = field.type === "text";
+
+            field.type = showing ? "password" : "text";
+
+            button.textContent = showing ? "Show" : "Hide";
+
+            button.setAttribute(
+                "aria-label",
+                showing ? "Show password" : "Hide password"
+            );
+
+        });
+
+    }
+);
+</script>
+
+</body>
+</html>

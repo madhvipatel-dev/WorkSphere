@@ -1,0 +1,557 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container-fluid py-4">
+
+    <!-- Header -->
+
+    <div class="d-flex justify-content-between
+                align-items-start mb-4">
+
+        <div>
+
+            <a href="{% url 'meeting_list' %}"
+               class="text-decoration-none text-muted">
+
+                <i class="fas fa-arrow-left me-2"></i>
+                Back to Meetings
+
+            </a>
+
+            <h1 class="fw-bold mt-3 mb-1">
+                {{ meeting.title }}
+            </h1>
+
+            <p class="text-muted mb-0">
+                Meeting details and information
+            </p>
+
+        </div>
+
+
+        <!-- Actions -->
+
+        <div class="d-flex gap-2">
+
+            {% if meeting.organizer == request.user %}
+
+                <a href="{% url 'meeting_edit' meeting.id %}"
+                   class="btn btn-outline-primary">
+
+                    <i class="fas fa-edit me-2"></i>
+                    Edit
+
+                </a>
+
+
+                <a href="{% url 'meeting_delete' meeting.id %}"
+                   class="btn btn-outline-danger">
+
+                    <i class="fas fa-trash me-2"></i>
+                    Delete
+
+                </a>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+
+    <div class="row g-4">
+
+
+        <!-- Main Content -->
+
+        <div class="col-lg-8">
+
+
+            <!-- Description -->
+
+            <div class="card border-0 shadow-sm mb-4">
+
+                <div class="card-body p-4">
+
+                    <h5 class="fw-bold mb-3">
+
+                        <i class="fas fa-align-left
+                                  text-primary me-2"></i>
+
+                        Meeting Description
+
+                    </h5>
+
+
+                    {% if meeting.description %}
+
+                        <p class="text-muted mb-0"
+                           style="line-height:1.8;">
+
+                            {{ meeting.description }}
+
+                        </p>
+
+                    {% else %}
+
+                        <p class="text-muted mb-0">
+
+                            No description has been added
+                            for this meeting.
+
+                        </p>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+
+            <!-- Meeting Schedule -->
+
+            <div class="card border-0 shadow-sm mb-4">
+
+                <div class="card-body p-4">
+
+                    <h5 class="fw-bold mb-4">
+
+                        <i class="fas fa-calendar-alt
+                                  text-primary me-2"></i>
+
+                        Meeting Schedule
+
+                    </h5>
+
+
+                    <div class="row">
+
+
+                        <!-- Date -->
+
+                        <div class="col-md-4 mb-3">
+
+                            <div class="d-flex align-items-center">
+
+                                <div class="bg-primary bg-opacity-10
+                                            text-primary rounded-3
+                                            p-3 me-3">
+
+                                    <i class="fas fa-calendar-day"></i>
+
+                                </div>
+
+                                <div>
+
+                                    <small class="text-muted d-block">
+                                        Date
+                                    </small>
+
+                                    <strong>
+                                        {{ meeting.meeting_date|date:"d M Y" }}
+                                    </strong>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- Start Time -->
+
+                        <div class="col-md-4 mb-3">
+
+                            <div class="d-flex align-items-center">
+
+                                <div class="bg-info bg-opacity-10
+                                            text-info rounded-3
+                                            p-3 me-3">
+
+                                    <i class="fas fa-clock"></i>
+
+                                </div>
+
+                                <div>
+
+                                    <small class="text-muted d-block">
+                                        Start Time
+                                    </small>
+
+                                    <strong>
+                                        {{ meeting.start_time|time:"h:i A" }}
+                                    </strong>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- End Time -->
+
+                        <div class="col-md-4 mb-3">
+
+                            <div class="d-flex align-items-center">
+
+                                <div class="bg-secondary bg-opacity-10
+                                            text-secondary rounded-3
+                                            p-3 me-3">
+
+                                    <i class="fas fa-hourglass-end"></i>
+
+                                </div>
+
+                                <div>
+
+                                    <small class="text-muted d-block">
+                                        End Time
+                                    </small>
+
+                                    {% if meeting.end_time %}
+
+                                        <strong>
+                                            {{ meeting.end_time|time:"h:i A" }}
+                                        </strong>
+
+                                    {% else %}
+
+                                        <strong>
+                                            Not set
+                                        </strong>
+
+                                    {% endif %}
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- Participants -->
+
+            <div class="card border-0 shadow-sm">
+
+                <div class="card-body p-4">
+
+                    <h5 class="fw-bold mb-4">
+
+                        <i class="fas fa-users
+                                  text-primary me-2"></i>
+
+                        Participants
+
+                    </h5>
+
+
+                    {% if meeting.participants.all %}
+
+                        <div class="row">
+
+                            {% for participant in meeting.participants.all %}
+
+                                <div class="col-md-6 mb-3">
+
+                                    <div class="d-flex
+                                                align-items-center">
+
+                                        <div class="rounded-circle
+                                                    bg-primary
+                                                    text-white
+                                                    d-flex
+                                                    align-items-center
+                                                    justify-content-center
+                                                    me-3"
+                                             style="width:42px;
+                                                    height:42px;">
+
+                                            {{ participant.username|first|upper }}
+
+                                        </div>
+
+                                        <div>
+
+                                            <strong class="d-block">
+
+                                                {{ participant.username }}
+
+                                            </strong>
+
+                                            {% if participant.email %}
+
+                                                <small class="text-muted">
+
+                                                    {{ participant.email }}
+
+                                                </small>
+
+                                            {% endif %}
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            {% empty %}
+
+                                <div class="col-12">
+
+                                    <p class="text-muted mb-0">
+
+                                        No participants have been added
+                                        to this meeting.
+
+                                    </p>
+
+                                </div>
+
+                            {% endfor %}
+
+                        </div>
+
+                    {% else %}
+
+                        <p class="text-muted mb-0">
+
+                            No participants have been added
+                            to this meeting.
+
+                        </p>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Right Side -->
+
+        <div class="col-lg-4">
+
+
+            <!-- Meeting Information -->
+
+            <div class="card border-0 shadow-sm">
+
+                <div class="card-body p-4">
+
+                    <h5 class="fw-bold mb-4">
+
+                        <i class="fas fa-info-circle
+                                  text-primary me-2"></i>
+
+                        Meeting Information
+
+                    </h5>
+
+
+                    <!-- Project -->
+
+                    <div class="mb-4">
+
+                        <small class="text-muted d-block mb-1">
+                            Project
+                        </small>
+
+                        <a href="{% url 'project_detail' meeting.project.id %}"
+                           class="text-decoration-none fw-semibold">
+
+                            <i class="fas fa-folder me-2"></i>
+
+                            {{ meeting.project.name }}
+
+                        </a>
+
+                    </div>
+
+
+                    <!-- Organizer -->
+
+                    <div class="mb-4">
+
+                        <small class="text-muted d-block mb-2">
+                            Organizer
+                        </small>
+
+                        <div class="d-flex align-items-center">
+
+                            <div class="rounded-circle
+                                        bg-primary
+                                        text-white
+                                        d-flex
+                                        align-items-center
+                                        justify-content-center me-2"
+                                 style="width:40px;height:40px;">
+
+                                {{ meeting.organizer.username|first|upper }}
+
+                            </div>
+
+                            <strong>
+                                {{ meeting.organizer.username }}
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Status -->
+
+                    <div class="mb-4">
+
+                        <small class="text-muted d-block mb-2">
+                            Status
+                        </small>
+
+
+                        {% if meeting.status == "scheduled" %}
+
+                            <span class="badge bg-primary fs-6 px-3 py-2">
+
+                                <i class="fas fa-clock me-1"></i>
+
+                                Scheduled
+
+                            </span>
+
+                        {% elif meeting.status == "completed" %}
+
+                            <span class="badge bg-success fs-6 px-3 py-2">
+
+                                <i class="fas fa-check me-1"></i>
+
+                                Completed
+
+                            </span>
+
+                        {% elif meeting.status == "cancelled" %}
+
+                            <span class="badge bg-danger fs-6 px-3 py-2">
+
+                                <i class="fas fa-times me-1"></i>
+
+                                Cancelled
+
+                            </span>
+
+                        {% endif %}
+
+                    </div>
+
+
+                    <!-- Location -->
+
+                    <div class="mb-4">
+
+                        <small class="text-muted d-block mb-1">
+                            Location
+                        </small>
+
+                        {% if meeting.location %}
+
+                            <strong>
+
+                                <i class="fas fa-map-marker-alt
+                                          text-primary me-2"></i>
+
+                                {{ meeting.location }}
+
+                            </strong>
+
+                        {% else %}
+
+                            <span class="text-muted">
+                                Not specified
+                            </span>
+
+                        {% endif %}
+
+                    </div>
+
+
+                    <!-- Meeting Link -->
+
+                    <div class="mb-4">
+
+                        <small class="text-muted d-block mb-2">
+                            Meeting Link
+                        </small>
+
+                        {% if meeting.meeting_link %}
+
+                            <a href="{{ meeting.meeting_link }}"
+                               target="_blank"
+                               rel="noopener noreferrer"
+                               class="btn btn-primary w-100">
+
+                                <i class="fas fa-video me-2"></i>
+
+                                Join Meeting
+
+                            </a>
+
+                        {% else %}
+
+                            <span class="text-muted">
+                                No online meeting link
+                            </span>
+
+                        {% endif %}
+
+                    </div>
+
+
+                    <!-- Created -->
+
+                    <div class="mb-4">
+
+                        <small class="text-muted d-block mb-1">
+                            Created
+                        </small>
+
+                        <strong>
+                            {{ meeting.created_at|date:"d M Y, h:i A" }}
+                        </strong>
+
+                    </div>
+
+
+                    <!-- Updated -->
+
+                    <div>
+
+                        <small class="text-muted d-block mb-1">
+                            Last Updated
+                        </small>
+
+                        <strong>
+                            {{ meeting.updated_at|date:"d M Y, h:i A" }}
+                        </strong>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

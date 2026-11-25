@@ -1,0 +1,419 @@
+
+{% extends "base.html" %}
+
+{% block title %}
+    {{ project_file.title }} | WorkSphere
+{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid py-4">
+
+    <!-- ================================================== -->
+    <!-- PAGE HEADER -->
+    <!-- ================================================== -->
+
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+
+        <div>
+
+            <nav aria-label="breadcrumb">
+
+                <ol class="breadcrumb mb-2">
+
+                    <li class="breadcrumb-item">
+                        <a href="{% url 'file_list' %}"
+                           class="text-decoration-none">
+                            Files
+                        </a>
+                    </li>
+
+                    <li class="breadcrumb-item active"
+                        aria-current="page">
+                        File Details
+                    </li>
+
+                </ol>
+
+            </nav>
+
+            <h2 class="fw-bold mb-1">
+                <i class="fa-solid fa-file-lines text-primary me-2"></i>
+                File Details
+            </h2>
+
+            <p class="text-muted mb-0">
+                View file information and download project documents.
+            </p>
+
+        </div>
+
+        <a href="{% url 'file_list' %}"
+           class="btn btn-outline-secondary">
+
+            <i class="fa-solid fa-arrow-left me-2"></i>
+            Back to Files
+
+        </a>
+
+    </div>
+
+
+    <!-- ================================================== -->
+    <!-- FILE DETAILS -->
+    <!-- ================================================== -->
+
+    <div class="row g-4">
+
+        <!-- MAIN FILE INFORMATION -->
+
+        <div class="col-lg-8">
+
+            <div class="card border-0 shadow-sm h-100">
+
+                <div class="card-body p-4">
+
+                    <!-- FILE HEADER -->
+
+                    <div class="d-flex flex-wrap align-items-start gap-3 mb-4">
+
+                        <div class="rounded-3 bg-primary bg-opacity-10 p-3">
+
+                            <i class="fa-solid fa-file-lines text-primary fs-2"></i>
+
+                        </div>
+
+                        <div class="flex-grow-1">
+
+                            <h4 class="fw-bold mb-2 text-break">
+                                {{ project_file.title }}
+                            </h4>
+
+                            <span class="badge bg-light text-dark border">
+
+                                <i class="fa-solid fa-folder me-1"></i>
+                                {{ project_file.project.name }}
+
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <hr class="my-4">
+
+
+                    <!-- DESCRIPTION -->
+
+                    <div class="mb-4">
+
+                        <h6 class="fw-bold mb-2">
+
+                            <i class="fa-solid fa-align-left text-primary me-2"></i>
+                            Description
+
+                        </h6>
+
+                        {% if project_file.description %}
+
+                            <div class="text-muted"
+                                 style="white-space: pre-wrap; overflow-wrap: anywhere;">{{ project_file.description }}</div>
+
+                        {% else %}
+
+                            <p class="text-muted fst-italic mb-0">
+                                No description provided for this file.
+                            </p>
+
+                        {% endif %}
+
+                    </div>
+
+
+                    <!-- FILE INFORMATION -->
+
+                    <h6 class="fw-bold mb-3">
+
+                        <i class="fa-solid fa-circle-info text-primary me-2"></i>
+                        File Information
+
+                    </h6>
+
+                    <div class="table-responsive">
+
+                        <table class="table table-borderless align-middle mb-0">
+
+                            <tbody>
+
+                                <tr>
+
+                                    <th class="text-muted fw-medium"
+                                        style="width: 35%;">
+                                        File Name
+                                    </th>
+
+                                    <td class="text-break">
+                                        {{ project_file.file.name }}
+                                    </td>
+
+                                </tr>
+
+                                <tr>
+
+                                    <th class="text-muted fw-medium">
+                                        Project
+                                    </th>
+
+                                    <td>
+                                        {{ project_file.project.name }}
+                                    </td>
+
+                                </tr>
+
+                                <tr>
+
+                                    <th class="text-muted fw-medium">
+                                        Uploaded By
+                                    </th>
+
+                                    <td>
+
+                                        <div class="d-flex align-items-center">
+
+                                            <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center me-2"
+                                                 style="width: 32px; height: 32px; min-width: 32px;">
+
+                                                {{ project_file.uploaded_by.username|first|upper }}
+
+                                            </div>
+
+                                            <span>
+                                                {{ project_file.uploaded_by.username }}
+                                            </span>
+
+                                        </div>
+
+                                    </td>
+
+                                </tr>
+
+                                <tr>
+
+                                    <th class="text-muted fw-medium">
+                                        Uploaded On
+                                    </th>
+
+                                    <td>
+                                        {{ project_file.uploaded_at|date:"d M Y, h:i A" }}
+                                    </td>
+
+                                </tr>
+
+                                <tr>
+
+                                    <th class="text-muted fw-medium">
+                                        Last Updated
+                                    </th>
+
+                                    <td>
+                                        {{ project_file.updated_at|date:"d M Y, h:i A" }}
+                                    </td>
+
+                                </tr>
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+
+                    <hr class="my-4">
+
+
+                    <!-- MAIN ACTIONS -->
+
+                    <div class="d-flex flex-wrap gap-2">
+
+                        <a href="{% url 'file_download' project_file.id %}"
+                           class="btn btn-success">
+
+                            <i class="fa-solid fa-download me-2"></i>
+                            Download File
+
+                        </a>
+
+
+                        {% if can_edit_file %}
+
+                        <a href="{% url 'file_edit' project_file.id %}"
+                           class="btn btn-outline-primary">
+
+                            <i class="fa-solid fa-pen-to-square me-2"></i>
+                            Edit File
+
+                        </a>
+
+                        {% endif %}
+
+
+                        {% if can_delete_file %}
+
+                        <a href="{% url 'file_delete' project_file.id %}"
+                           class="btn btn-outline-danger">
+
+                            <i class="fa-solid fa-trash me-2"></i>
+                            Delete File
+
+                        </a>
+
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ================================================== -->
+        <!-- SIDEBAR -->
+        <!-- ================================================== -->
+
+        <div class="col-lg-4">
+
+            <!-- FILE DOWNLOAD CARD -->
+
+            <div class="card border-0 shadow-sm mb-4">
+
+                <div class="card-body p-4 text-center">
+
+                    <div class="rounded-circle bg-success bg-opacity-10 d-inline-flex align-items-center justify-content-center mb-3"
+                         style="width: 76px; height: 76px;">
+
+                        <i class="fa-solid fa-cloud-arrow-down text-success fs-2"></i>
+
+                    </div>
+
+                    <h5 class="fw-bold">
+                        Download Document
+                    </h5>
+
+                    <p class="text-muted small">
+                        Download this project file to your device.
+                    </p>
+
+                    <a href="{% url 'file_download' project_file.id %}"
+                       class="btn btn-success w-100">
+
+                        <i class="fa-solid fa-download me-2"></i>
+                        Download File
+
+                    </a>
+
+                    <p class="text-muted small mt-3 mb-0">
+
+                        <i class="fa-solid fa-shield-halved me-1"></i>
+                        Available to authorized project members.
+
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <!-- PROJECT CARD -->
+
+            <div class="card border-0 shadow-sm mb-4">
+
+                <div class="card-header bg-white border-0 pt-4 px-4">
+
+                    <h6 class="fw-bold mb-0">
+
+                        <i class="fa-solid fa-folder text-primary me-2"></i>
+                        Associated Project
+
+                    </h6>
+
+                </div>
+
+                <div class="card-body px-4 pb-4">
+
+                    <h6 class="fw-semibold mb-2">
+                        {{ project_file.project.name }}
+                    </h6>
+
+                    {% if project_file.project.description %}
+
+                        <p class="text-muted small mb-3">
+                            {{ project_file.project.description|truncatechars:140 }}
+                        </p>
+
+                    {% endif %}
+
+                    <a href="{% url 'project_detail' project_file.project.id %}"
+                       class="btn btn-outline-primary btn-sm">
+
+                        <i class="fa-solid fa-arrow-up-right-from-square me-1"></i>
+                        View Project
+
+                    </a>
+
+                </div>
+
+            </div>
+
+
+            <!-- ACCESS INFORMATION -->
+
+            <div class="card border-0 shadow-sm">
+
+                <div class="card-body p-4">
+
+                    <h6 class="fw-bold mb-3">
+
+                        <i class="fa-solid fa-lock text-primary me-2"></i>
+                        File Access
+
+                    </h6>
+
+                    <p class="text-muted small mb-3">
+                        Access to this file is restricted to authorized
+                        internal project users.
+                    </p>
+
+                    {% if can_manage_project_files %}
+
+                        <span class="badge bg-primary">
+                            Project File Manager
+                        </span>
+
+                    {% elif can_edit_file %}
+
+                        <span class="badge bg-info text-dark">
+                            File Owner
+                        </span>
+
+                    {% else %}
+
+                        <span class="badge bg-secondary">
+                            View and Download
+                        </span>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

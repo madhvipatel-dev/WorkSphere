@@ -1,0 +1,306 @@
+
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>{% block title %}WorkSphere{% endblock %}</title>
+
+    <!-- Bootstrap -->
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+
+    <!-- Font Awesome -->
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+    >
+
+    <!-- WorkSphere CSS -->
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+
+<body>
+
+<div class="app-layout">
+
+    <!-- Mobile Overlay -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+
+        <!-- Brand -->
+        <div class="sidebar-brand">
+            <div class="brand-icon">
+                <i class="fa-solid fa-layer-group"></i>
+            </div>
+
+            <div class="brand-text">
+                <div class="brand-name">WorkSphere</div>
+                <small>Work smarter together</small>
+            </div>
+        </div>
+
+        <!-- Navigation -->
+        <nav class="sidebar-nav">
+
+            <div class="nav-section-title">MAIN</div>
+
+            <!-- Dashboard -->
+            <a
+                href="{% url 'dashboard' %}"
+                class="nav-item {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}"
+            >
+                <i class="fa-solid fa-chart-pie"></i>
+                <span>Dashboard</span>
+            </a>
+
+            <!-- Projects -->
+            <a
+                href="{% url 'project_list' %}"
+                class="nav-item {% if request.resolver_match.url_name == 'project_list' or request.resolver_match.url_name == 'project_detail' or request.resolver_match.url_name == 'project_create' or request.resolver_match.url_name == 'project_edit' or request.resolver_match.url_name == 'project_members' or request.resolver_match.url_name == 'project_discussion' %}active{% endif %}"
+            >
+                <i class="fa-solid fa-folder"></i>
+                <span>Projects</span>
+            </a>
+
+            <!-- Tasks -->
+            <a
+                href="{% url 'task_list' %}"
+                class="nav-item {% if request.resolver_match.url_name == 'task_list' or request.resolver_match.url_name == 'task_detail' or request.resolver_match.url_name == 'task_create' or request.resolver_match.url_name == 'task_edit' %}active{% endif %}"
+            >
+                <i class="fa-solid fa-list-check"></i>
+                <span>Tasks</span>
+            </a>
+
+            <!-- Workspace -->
+            <div class="nav-section-title">WORKSPACE</div>
+
+            <!-- Team -->
+            <a
+                href="/team/"
+                class="nav-item {% if request.path|slice:':6' == '/team/' %}active{% endif %}"
+            >
+                <i class="fa-solid fa-users"></i>
+                <span>Team</span>
+            </a>
+
+            <!-- Meetings -->
+            <a
+                href="{% url 'meeting_list' %}"
+                class="nav-item {% if request.resolver_match.url_name == 'meeting_list' or request.resolver_match.url_name == 'meeting_detail' or request.resolver_match.url_name == 'meeting_create' or request.resolver_match.url_name == 'meeting_edit' %}active{% endif %}"
+            >
+                <i class="fa-regular fa-calendar"></i>
+                <span>Meetings</span>
+            </a>
+
+            <!-- Files -->
+            <a
+                href="{% url 'file_list' %}"
+                class="nav-item {% if request.resolver_match.url_name == 'file_list' or request.resolver_match.url_name == 'file_detail' or request.resolver_match.url_name == 'file_upload' or request.resolver_match.url_name == 'file_edit' %}active{% endif %}"
+            >
+                <i class="fa-solid fa-folder-open"></i>
+                <span>Files</span>
+            </a>
+
+            <!-- Communication -->
+            <div class="nav-section-title">COMMUNICATION</div>
+
+            <!-- Discussions -->
+           
+<!-- Discussions: Hidden for Client users -->
+{% if request.user.is_superuser %}
+    <a
+        href="{% url 'ws_discussions:discussion_list' %}"
+        class="nav-item {% if request.resolver_match.app_name == 'ws_discussions' %}active{% endif %}"
+    >
+        <i class="fa-regular fa-comments"></i>
+        <span>Discussions</span>
+    </a>
+{% elif request.user.is_authenticated %}
+    {% if request.user.profile.is_approved %}
+        {% if request.user.profile.role == 'admin' or request.user.profile.role == 'manager' or request.user.profile.role == 'employee' %}
+            <a
+                href="{% url 'ws_discussions:discussion_list' %}"
+                class="nav-item {% if request.resolver_match.app_name == 'ws_discussions' %}active{% endif %}"
+            >
+                <i class="fa-regular fa-comments"></i>
+                <span>Discussions</span>
+            </a>
+        {% endif %}
+    {% endif %}
+{% endif %}
+
+            <!-- Notifications -->
+            <a
+                href="{% url 'notification_list' %}"
+                class="nav-item {% if request.resolver_match.url_name == 'notification_list' or request.resolver_match.url_name == 'mark_notification_read' or request.resolver_match.url_name == 'mark_all_notifications_read' %}active{% endif %}"
+            >
+                <i class="fa-regular fa-bell"></i>
+                <span>Notifications</span>
+            </a>
+
+        </nav>
+
+        <!-- Sidebar Bottom -->
+        <div class="sidebar-bottom">
+
+            <!-- My Profile -->
+            <a
+                href="{% url 'my_profile' %}"
+                class="nav-item {% if request.resolver_match.url_name == 'my_profile' %}active{% endif %}"
+            >
+                <i class="fa-solid fa-user-circle"></i>
+                <span>My Profile</span>
+            </a>
+
+            <!-- Settings -->
+            <a
+                href="{% url 'account_settings' %}"
+                class="nav-item {% if request.resolver_match.url_name == 'account_settings' %}active{% endif %}"
+            >
+                <i class="fa-solid fa-gear"></i>
+                <span>Settings</span>
+            </a>
+
+            <!-- Logout -->
+            <a
+                href="{% url 'logout' %}"
+                class="nav-item logout-item"
+            >
+                <i class="fa-solid fa-right-from-bracket"></i>
+                <span>Logout</span>
+            </a>
+
+        </div>
+
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+
+        <!-- Top Navbar -->
+        <header class="top-navbar">
+
+            <!-- Mobile Menu -->
+            <button
+                type="button"
+                class="mobile-menu-button"
+                id="mobileMenuButton"
+                aria-label="Open navigation"
+            >
+                <i class="fa-solid fa-bars"></i>
+            </button>
+
+            <!-- Search -->
+            <div class="top-search">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input
+                    type="text"
+                    placeholder="Search projects, tasks..."
+                >
+            </div>
+
+            <!-- Right Side -->
+            <div class="top-navbar-right">
+
+                <!-- Notification -->
+                <a
+                    href="{% url 'notification_list' %}"
+                    class="notification-button"
+                    title="Notifications"
+                >
+                    <i class="fa-regular fa-bell"></i>
+                    <span class="notification-dot"></span>
+                </a>
+
+                <!-- User Profile -->
+                <div class="user-profile">
+
+                    <div class="user-avatar">
+                        {{ request.user.username|first|upper }}
+                    </div>
+
+                    <div class="user-details">
+
+                        <strong>
+                            {{ request.user.username|default:"WorkSphere User" }}
+                        </strong>
+
+                        <small>
+                            {% if request.user.is_superuser %}
+                                Admin
+                            {% elif request.user.profile %}
+                                {{ request.user.profile.get_role_display }}
+                            {% else %}
+                                Not assigned
+                            {% endif %}
+                        </small>
+
+                    </div>
+
+                    <i class="fa-solid fa-chevron-down user-arrow"></i>
+
+                </div>
+
+            </div>
+
+        </header>
+
+        <!-- Page Content -->
+        <div class="page-content">
+
+            <!-- Django Messages -->
+            {% if request.resolver_match.app_name != 'ws_discussions' %}
+
+                {% if messages %}
+
+                    {% for message in messages %}
+
+                        <div
+                            class="alert {% if message.tags == 'error' %}alert-danger{% elif message.tags %}alert-{{ message.tags }}{% else %}alert-info{% endif %} alert-dismissible fade show"
+                            role="alert"
+                        >
+
+                            {{ message }}
+
+                            <button
+                                type="button"
+                                class="btn-close"
+                                data-bs-dismiss="alert"
+                                aria-label="Close"
+                            ></button>
+
+                        </div>
+
+                    {% endfor %}
+
+                {% endif %}
+
+            {% endif %}
+
+            <!-- Page Content Block -->
+            {% block content %}
+            {% endblock %}
+
+        </div>
+
+    </main>
+
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- WorkSphere JS -->
+<script src="{% static 'js/app.js' %}"></script>
+
+</body>
+</html>

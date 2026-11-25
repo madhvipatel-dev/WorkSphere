@@ -1,0 +1,253 @@
+
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container-fluid py-4">
+
+    <!-- Dashboard Header -->
+    <div class="d-flex justify-content-between
+                align-items-center flex-wrap gap-3 mb-4">
+
+        <div>
+            <h1 class="fw-bold mb-1">
+                <i class="fas fa-briefcase text-primary me-2"></i>
+                Client Dashboard
+            </h1>
+
+            <p class="text-muted mb-0">
+                Welcome, {{ request.user.username }}.
+                Track your assigned projects and progress.
+            </p>
+        </div>
+
+        <span class="badge bg-primary fs-6 px-3 py-2">
+            <i class="fas fa-eye me-1"></i>
+            Read-Only Access
+        </span>
+
+    </div>
+
+    <!-- Dashboard Statistics -->
+    <div class="row g-3 mb-4">
+
+        <div class="col-md-6 col-xl-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body p-4">
+                    <p class="text-muted mb-2">
+                        Total Projects
+                    </p>
+                    <h2 class="fw-bold mb-0">
+                        {{ total }}
+                    </h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-xl-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body p-4">
+                    <p class="text-muted mb-2">
+                        Planning
+                    </p>
+                    <h2 class="fw-bold text-secondary mb-0">
+                        {{ pending }}
+                    </h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-xl-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body p-4">
+                    <p class="text-muted mb-2">
+                        In Progress
+                    </p>
+                    <h2 class="fw-bold text-primary mb-0">
+                        {{ active }}
+                    </h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-xl-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body p-4">
+                    <p class="text-muted mb-2">
+                        Completed
+                    </p>
+                    <h2 class="fw-bold text-success mb-0">
+                        {{ completed }}
+                    </h2>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Assigned Projects -->
+    <div class="d-flex justify-content-between
+                align-items-center mb-3">
+
+        <h4 class="fw-bold mb-0">
+            My Assigned Projects
+        </h4>
+
+        <span class="text-muted small">
+            {{ total }} project{{ total|pluralize }}
+        </span>
+
+    </div>
+
+    <div class="row g-4">
+
+        {% for project in projects %}
+
+        <div class="col-md-6 col-xl-4">
+
+            <div class="card border-0 shadow-sm h-100">
+
+                <div class="card-body p-4">
+
+                    <!-- Project Name -->
+                    <h5 class="fw-bold mb-3">
+                        {{ project.name }}
+                    </h5>
+
+                    <!-- Status -->
+                    <div class="mb-3">
+
+                        {% if project.status == "completed" %}
+                            <span class="badge bg-success">
+                                Completed
+                            </span>
+
+                        {% elif project.status == "in_progress" %}
+                            <span class="badge bg-primary">
+                                In Progress
+                            </span>
+
+                        {% elif project.status == "planning" %}
+                            <span class="badge bg-secondary">
+                                Planning
+                            </span>
+
+                        {% elif project.status == "on_hold" %}
+                            <span class="badge bg-warning text-dark">
+                                On Hold
+                            </span>
+
+                        {% endif %}
+
+                    </div>
+
+                    <!-- Description -->
+                    <p class="text-muted small">
+                        {% if project.description %}
+                            {{ project.description|truncatewords:20 }}
+                        {% else %}
+                            No description available.
+                        {% endif %}
+                    </p>
+
+                    <!-- Owner -->
+                    <p class="small mb-2">
+                        <strong>Project Owner:</strong>
+                        {{ project.owner.username }}
+                    </p>
+
+                    <!-- Deadline -->
+                    <p class="small mb-3">
+                        <strong>Deadline:</strong>
+
+                        {% if project.deadline %}
+                            {{ project.deadline|date:"d M Y" }}
+                        {% else %}
+                            Not set
+                        {% endif %}
+                    </p>
+
+                    <!-- Progress -->
+                    <div class="d-flex justify-content-between mb-2">
+
+                        <strong class="small">
+                            Project Progress
+                        </strong>
+
+                        <strong class="text-primary">
+                            {{ project.dashboard_progress }}%
+                        </strong>
+
+                    </div>
+
+                    <div class="progress mb-2"
+                         style="height: 10px;">
+
+                        
+<div
+    class="progress-bar bg-primary"
+    role="progressbar"
+    data-progress="{{ project.progress_percentage }}"
+    aria-valuenow="{{ project.progress_percentage }}"
+    aria-valuemin="0"
+    aria-valuemax="100">
+</div>
+
+
+                    </div>
+
+                    <p class="text-muted small mb-4">
+                        {{ project.done_count }}
+                        of
+                        {{ project.task_count }}
+                        tasks completed
+                    </p>
+
+                    <!-- Read-Only Details -->
+                    <a href="{% url 'client_request_detail' project.pk %}"
+                       class="btn btn-outline-primary w-100">
+
+                        <i class="fas fa-eye me-2"></i>
+                        View Project Details
+
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        {% empty %}
+
+        <div class="col-12">
+
+            <div class="card border-0 shadow-sm">
+
+                <div class="card-body text-center py-5">
+
+                    <i class="fas fa-folder-open
+                              fa-3x text-muted mb-3"></i>
+
+                    <h5 class="fw-bold">
+                        No Projects Assigned
+                    </h5>
+
+                    <p class="text-muted mb-0">
+                        You currently have no assigned projects.
+                        Please contact your project manager.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+</div>
+
+{% endblock %}

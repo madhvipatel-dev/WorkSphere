@@ -1,0 +1,703 @@
+
+{% extends "base.html" %}
+
+{% block title %}Submit Work | WorkSphere{% endblock %}
+
+{% block content %}
+<div class="page-content">
+    <div class="dashboard-page">
+
+        <!-- Page Header -->
+        <div class="dashboard-header">
+            <div>
+                <h1>Submit Work</h1>
+                <p>
+                    Submit completed work and track manager feedback.
+                </p>
+            </div>
+
+            <div>
+                <a
+                    href="{% url 'employee_task_list' %}"
+                    class="btn btn-outline-secondary"
+                >
+                    <i class="fa-solid fa-arrow-left"></i>
+                    Back to My Tasks
+                </a>
+            </div>
+        </div>
+
+        <!-- Task Information -->
+        <div class="dashboard-panel">
+
+            <div class="dashboard-section-title">
+                <div>
+                    <h2>Task Information</h2>
+                    <p>Review your task before submitting work.</p>
+                </div>
+
+                <span class="badge bg-success">
+                    <i class="fa-solid fa-circle-check"></i>
+                    {{ task.get_status_display }}
+                </span>
+            </div>
+
+            <div class="row g-4">
+
+                <!-- Task Details -->
+                <div class="col-lg-8">
+
+                    <h4 class="mb-3">
+                        {{ task.title }}
+                    </h4>
+
+                    {% if task.description %}
+                        <div class="submission-description mb-4">
+                            {{ task.description }}
+                        </div>
+                    {% endif %}
+
+                    <div class="d-flex flex-wrap gap-2">
+
+                        <span class="badge bg-light text-dark border">
+                            <i class="fa-solid fa-folder"></i>
+                            {{ task.project.name }}
+                        </span>
+
+                        {% if task.priority == "urgent" %}
+                            <span class="badge bg-danger">
+                                Urgent Priority
+                            </span>
+
+                        {% elif task.priority == "high" %}
+                            <span class="badge bg-warning text-dark">
+                                High Priority
+                            </span>
+
+                        {% elif task.priority == "medium" %}
+                            <span class="badge bg-info text-dark">
+                                Medium Priority
+                            </span>
+
+                        {% else %}
+                            <span class="badge bg-secondary">
+                                Low Priority
+                            </span>
+                        {% endif %}
+
+                    </div>
+                </div>
+
+                <!-- Assignment Details -->
+                <div class="col-lg-4">
+
+                    <div class="submission-info-card">
+
+                        <div class="mb-3">
+                            <small class="text-muted d-block mb-1">
+                                Assigned To
+                            </small>
+
+                            <strong>
+                                {% if task.assigned_to.get_full_name %}
+                                    {{ task.assigned_to.get_full_name }}
+                                {% else %}
+                                    {{ task.assigned_to.username }}
+                                {% endif %}
+                            </strong>
+                        </div>
+
+                        <div>
+                            <small class="text-muted d-block mb-1">
+                                Due Date
+                            </small>
+
+                            {% if task.due_date %}
+                                <strong>
+                                    {{ task.due_date|date:"d M Y" }}
+                                </strong>
+                            {% else %}
+                                <span class="text-muted">
+                                    No deadline
+                                </span>
+                            {% endif %}
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Latest Submission Status -->
+        {% if latest_submission %}
+
+            <div class="dashboard-panel mt-4">
+
+                <div class="dashboard-section-title">
+                    <div>
+                        <h2>Latest Submission Status</h2>
+                        <p>
+                            Track the review status of your submitted work.
+                        </p>
+                    </div>
+                </div>
+
+                {% if submission_state == "pending" %}
+
+                    <div class="alert alert-warning mb-0">
+                        <div class="d-flex gap-3">
+
+                            <i class="fa-solid fa-clock fa-lg mt-1"></i>
+
+                            <div>
+                                <strong>
+                                    Waiting for Manager Review
+                                </strong>
+
+                                <p class="mb-0 mt-1">
+                                    Your work has been submitted successfully.
+                                    You cannot submit another version until
+                                    the current submission has been reviewed.
+                                </p>
+                            </div>
+
+                        </div>
+                    </div>
+
+                {% elif submission_state == "approved" %}
+
+                    <div class="alert alert-success mb-0">
+                        <div class="d-flex gap-3">
+
+                            <i class="fa-solid fa-circle-check fa-lg mt-1"></i>
+
+                            <div>
+                                <strong>
+                                    Work Approved
+                                </strong>
+
+                                <p class="mb-0 mt-1">
+                                    Your submitted work has been approved.
+                                    No further submission is required.
+                                </p>
+                            </div>
+
+                        </div>
+                    </div>
+
+                {% elif submission_state == "rejected" %}
+
+                    <div class="alert alert-danger mb-0">
+                        <div class="d-flex gap-3">
+
+                            <i class="fa-solid fa-circle-xmark fa-lg mt-1"></i>
+
+                            <div>
+                                <strong>
+                                    Submission Rejected
+                                </strong>
+
+                                <p class="mb-0 mt-1">
+                                    Your previous submission was rejected.
+                                    Review the feedback below and submit
+                                    a revised version of your work.
+                                </p>
+                            </div>
+
+                        </div>
+                    </div>
+
+                {% elif submission_state == "changes_requested" %}
+
+                    <div class="alert alert-info mb-0">
+                        <div class="d-flex gap-3">
+
+                            <i class="fa-solid fa-rotate fa-lg mt-1"></i>
+
+                            <div>
+                                <strong>
+                                    Changes Requested
+                                </strong>
+
+                                <p class="mb-0 mt-1">
+                                    The Manager has requested improvements.
+                                    Review the feedback and resubmit
+                                    your updated work.
+                                </p>
+                            </div>
+
+                        </div>
+                    </div>
+
+                {% endif %}
+
+                {% if latest_submission.manager_feedback %}
+
+                    <div class="submission-feedback-card mt-4">
+
+                        <h6 class="fw-semibold mb-3">
+                            <i class="fa-solid fa-comment-dots"></i>
+                            Manager Feedback
+                        </h6>
+
+                        <div class="submission-description">
+                            {{ latest_submission.manager_feedback }}
+                        </div>
+
+                    </div>
+
+                {% endif %}
+
+                <div class="mt-3">
+                    <small class="text-muted">
+                        Last submitted:
+                        {{ latest_submission.submitted_at|date:"d M Y, h:i A" }}
+
+                        {% if latest_submission.reviewed_at %}
+                            | Reviewed:
+                            {{ latest_submission.reviewed_at|date:"d M Y, h:i A" }}
+                        {% endif %}
+                    </small>
+                </div>
+
+            </div>
+
+        {% endif %}
+
+        <!-- Work Submission Form -->
+        <div class="dashboard-panel mt-4">
+
+            <div class="dashboard-section-title">
+                <div>
+                    <h2>
+                        {% if submission_state == "rejected" or submission_state == "changes_requested" %}
+                            Resubmit Work
+                        {% else %}
+                            Work Submission
+                        {% endif %}
+                    </h2>
+
+                    <p>
+                        {% if submission_state == "rejected" or submission_state == "changes_requested" %}
+                            Submit an updated version of your completed work.
+                        {% else %}
+                            Describe your completed work and attach supporting files.
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+
+            {% if can_submit_work %}
+
+                <form
+                    method="post"
+                    enctype="multipart/form-data"
+                    id="workSubmissionForm"
+                    action="{% url 'submit_work' task.id %}"
+                >
+                    {% csrf_token %}
+
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            {{ form.non_field_errors }}
+                        </div>
+                    {% endif %}
+
+                    <!-- Work Description -->
+                    <div class="mb-4">
+
+                        <label
+                            for="{{ form.comment.id_for_label }}"
+                            class="form-label fw-semibold"
+                        >
+                            <i class="fa-solid fa-align-left"></i>
+                            {{ form.comment.label }}
+                            <span class="text-danger">*</span>
+                        </label>
+
+                        {{ form.comment }}
+
+                        {% if form.comment.help_text %}
+                            <div class="form-text">
+                                {{ form.comment.help_text }}
+                            </div>
+                        {% endif %}
+
+                        {% if form.comment.errors %}
+                            <div class="text-danger small mt-2">
+                                {{ form.comment.errors }}
+                            </div>
+                        {% endif %}
+
+                    </div>
+
+                    <!-- Attachment -->
+                    <div class="mb-4">
+
+                        <label
+                            for="{{ form.attachment.id_for_label }}"
+                            class="form-label fw-semibold"
+                        >
+                            <i class="fa-solid fa-paperclip"></i>
+                            {{ form.attachment.label }}
+                        </label>
+
+                        {{ form.attachment }}
+
+                        {% if form.attachment.help_text %}
+                            <div class="form-text">
+                                {{ form.attachment.help_text }}
+                            </div>
+                        {% endif %}
+
+                        {% if form.attachment.errors %}
+                            <div class="text-danger small mt-2">
+                                {{ form.attachment.errors }}
+                            </div>
+                        {% endif %}
+
+                        <div class="form-text mt-2">
+                            Attach a supporting file if needed.
+                            The attachment is optional.
+                        </div>
+
+                    </div>
+
+                    <!-- Submission Notice -->
+                    <div class="alert alert-info">
+
+                        <div class="d-flex gap-3">
+
+                            <i class="fa-solid fa-circle-info fa-lg mt-1"></i>
+
+                            <div>
+                                <strong>Manager Review</strong>
+
+                                <p class="mb-0 mt-1">
+                                    Your work will be sent for review.
+                                    An authorized Manager or Admin can
+                                    approve, reject, or request changes.
+                                </p>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="submission-actions">
+
+                        <a
+                            href="{% url 'employee_task_list' %}"
+                            class="btn btn-outline-secondary"
+                        >
+                            <i class="fa-solid fa-xmark"></i>
+                            Cancel
+                        </a>
+
+                        <button
+                            type="submit"
+                            class="btn btn-primary"
+                            id="submitWorkButton"
+                        >
+                            <i class="fa-solid fa-paper-plane"></i>
+
+                            {% if submission_state == "rejected" or submission_state == "changes_requested" %}
+                                Resubmit Work
+                            {% else %}
+                                Submit Work
+                            {% endif %}
+                        </button>
+
+                    </div>
+
+                </form>
+
+            {% elif submission_state == "pending" %}
+
+                <div class="alert alert-warning mb-0">
+                    <i class="fa-solid fa-lock"></i>
+                    Submission is temporarily disabled while
+                    your work is awaiting review.
+                </div>
+
+            {% elif submission_state == "approved" %}
+
+                <div class="alert alert-success mb-0">
+                    <i class="fa-solid fa-lock"></i>
+                    Your work has already been approved.
+                    Further submissions are disabled.
+                </div>
+
+            {% endif %}
+
+        </div>
+
+        <!-- Previous Submissions -->
+        {% if previous_submissions %}
+
+            <div class="dashboard-panel mt-4">
+
+                <div class="dashboard-section-title">
+                    <div>
+                        <h2>Submission History</h2>
+                        <p>
+                            Review your previous submissions
+                            and Manager feedback.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+
+                    <table class="table align-middle submission-history-table">
+
+                        <thead>
+                            <tr>
+                                <th>Submitted</th>
+                                <th>Work Description</th>
+                                <th>Attachment</th>
+                                <th>Status</th>
+                                <th>Manager Feedback</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+
+                            {% for submission in previous_submissions %}
+
+                                <tr>
+
+                                    <td>
+                                        <div class="fw-semibold">
+                                            {{ submission.submitted_at|date:"d M Y" }}
+                                        </div>
+
+                                        <small class="text-muted">
+                                            {{ submission.submitted_at|date:"h:i A" }}
+                                        </small>
+                                    </td>
+
+                                    <td>
+                                        <div class="submission-history-text">
+                                            {{ submission.comment }}
+                                        </div>
+                                    </td>
+
+                                    <td>
+
+                                        {% if submission.attachment %}
+
+                                            <a
+                                                href="{{ submission.attachment.url }}"
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                class="btn btn-sm btn-outline-primary"
+                                            >
+                                                <i class="fa-solid fa-paperclip"></i>
+                                                View File
+                                            </a>
+
+                                        {% else %}
+
+                                            <span class="text-muted">
+                                                No attachment
+                                            </span>
+
+                                        {% endif %}
+
+                                    </td>
+
+                                    <td>
+
+                                        {% if submission.status == "pending" %}
+
+                                            <span class="badge bg-warning text-dark">
+                                                <i class="fa-solid fa-clock"></i>
+                                                Pending
+                                            </span>
+
+                                        {% elif submission.status == "approved" %}
+
+                                            <span class="badge bg-success">
+                                                <i class="fa-solid fa-check"></i>
+                                                Approved
+                                            </span>
+
+                                        {% elif submission.status == "rejected" %}
+
+                                            <span class="badge bg-danger">
+                                                <i class="fa-solid fa-xmark"></i>
+                                                Rejected
+                                            </span>
+
+                                        {% elif submission.status == "changes_requested" %}
+
+                                            <span class="badge bg-info text-dark">
+                                                <i class="fa-solid fa-rotate"></i>
+                                                Changes Requested
+                                            </span>
+
+                                        {% else %}
+
+                                            <span class="badge bg-secondary">
+                                                {{ submission.get_status_display }}
+                                            </span>
+
+                                        {% endif %}
+
+                                    </td>
+
+                                    <td>
+                                        {% if submission.manager_feedback %}
+
+                                            <div class="submission-history-text">
+                                                {{ submission.manager_feedback }}
+                                            </div>
+
+                                        {% elif submission.status == "pending" %}
+
+                                            <span class="text-muted">
+                                                Awaiting review
+                                            </span>
+
+                                        {% else %}
+
+                                            <span class="text-muted">
+                                                No feedback provided
+                                            </span>
+
+                                        {% endif %}
+                                    </td>
+
+                                </tr>
+
+                            {% endfor %}
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        {% endif %}
+
+    </div>
+</div>
+
+<style>
+    .submission-description {
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+        line-height: 1.7;
+    }
+
+    .submission-info-card {
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 22px;
+        height: 100%;
+    }
+
+    .submission-feedback-card {
+        border: 1px solid #bfdbfe;
+        background: #f8fbff;
+        border-radius: 12px;
+        padding: 22px;
+    }
+
+    .submission-actions {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+
+    .submission-history-table th {
+        white-space: nowrap;
+        font-weight: 600;
+    }
+
+    .submission-history-table td {
+        vertical-align: top;
+    }
+
+    .submission-history-text {
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+        max-width: 300px;
+        max-height: 160px;
+        overflow-y: auto;
+        line-height: 1.6;
+        font-size: 14px;
+    }
+
+    .submission-history-table .badge {
+        white-space: nowrap;
+        padding: 7px 10px;
+    }
+
+    @media (max-width: 768px) {
+        .submission-history-table {
+            min-width: 900px;
+        }
+
+        .submission-actions {
+            flex-direction: column-reverse;
+            align-items: stretch;
+        }
+
+        .submission-actions .btn {
+            width: 100%;
+        }
+
+        .submission-info-card,
+        .submission-feedback-card {
+            padding: 16px;
+        }
+    }
+</style>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const form = document.getElementById("workSubmissionForm");
+
+    if (!form) {
+        return;
+    }
+
+    const submitButton = document.getElementById(
+        "submitWorkButton"
+    );
+
+    form.addEventListener("submit", function (event) {
+        const commentField = form.querySelector(
+            '[name="comment"]'
+        );
+
+        if (!commentField || !commentField.value.trim()) {
+            event.preventDefault();
+
+            if (commentField) {
+                commentField.focus();
+            }
+
+            alert(
+                "Please describe the work you completed " +
+                "before submitting."
+            );
+
+            return;
+        }
+
+        if (submitButton) {
+            submitButton.disabled = true;
+        }
+    });
+});
+</script>
+{% endblock %}

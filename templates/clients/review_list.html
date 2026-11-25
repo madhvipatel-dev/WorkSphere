@@ -1,0 +1,25 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Review Requests | WorkSphere</title>
+</head>
+<body>
+    <h1>Client Project Requests</h1>
+
+    {% for project in requests %}
+        <div>
+            <h3>{{ project.title }}</h3>
+            <p>Client: {{ project.client.username }}</p>
+            <p>Status: {{ project.get_status_display }}</p>
+
+            <a href="{% url 'client_review_request' project.pk %}">
+                Review Request
+            </a>
+        </div>
+    {% empty %}
+        <p>No project requests found.</p>
+    {% endfor %}
+</body>
+</html>

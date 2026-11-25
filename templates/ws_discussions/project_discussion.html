@@ -1,0 +1,442 @@
+
+{% extends "base.html" %}
+
+{% block content %}
+
+<style>
+.project-chat-page {
+    max-width: 1100px;
+    margin: auto;
+}
+
+.project-chat-window {
+    height: 480px;
+    overflow-y: auto;
+    background: #f8fafc;
+    border-radius: 12px;
+    padding: 22px;
+}
+
+.project-chat-message {
+    display: flex;
+    margin-bottom: 18px;
+    gap: 10px;
+    align-items: flex-end;
+}
+
+.project-chat-message.mine {
+    flex-direction: row-reverse;
+}
+
+.project-chat-avatar {
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
+    border-radius: 50%;
+    background: #e0e7ff;
+    color: #3730a3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+}
+
+.project-chat-body {
+    max-width: 75%;
+}
+
+.project-chat-meta {
+    font-size: 12px;
+    color: #64748b;
+    margin-bottom: 5px;
+}
+
+.project-chat-message.mine .project-chat-meta {
+    text-align: right;
+}
+
+.project-chat-bubble {
+    padding: 11px 15px;
+    border-radius: 14px;
+    background: white;
+    border: 1px solid #e2e8f0;
+    overflow-wrap: anywhere;
+    white-space: pre-wrap;
+}
+
+.project-chat-message.mine .project-chat-bubble {
+    background: #2563eb;
+    color: white;
+    border-color: #2563eb;
+}
+
+.project-chat-form {
+    display: flex;
+    gap: 10px;
+}
+
+.project-chat-form textarea {
+    resize: none;
+    min-height: 48px;
+}
+
+.project-chat-empty {
+    text-align: center;
+    color: #64748b;
+    padding: 80px 10px;
+}
+
+@media (max-width: 600px) {
+    .project-chat-window {
+        height: 400px;
+        padding: 12px;
+    }
+
+    .project-chat-body {
+        max-width: 85%;
+    }
+
+    .project-chat-form {
+        flex-direction: column;
+    }
+
+    .project-chat-form button {
+        width: 100%;
+    }
+}
+</style>
+
+<div class="container-fluid py-4 project-chat-page">
+
+    <!-- Header -->
+    <div class="d-flex justify-content-between
+                align-items-center flex-wrap gap-3 mb-4">
+
+        <div>
+            <a href="{% url 'project_detail' project.id %}"
+               class="text-decoration-none text-muted">
+
+                <i class="fas fa-arrow-left me-2"></i>
+                Back to Project
+
+            </a>
+
+            <h2 class="fw-bold mt-3 mb-1">
+                <i class="fas fa-comments text-primary me-2"></i>
+                {{ project.name }}
+            </h2>
+
+            <p class="text-muted mb-0">
+                Project Discussions
+            </p>
+        </div>
+
+        <span class="badge bg-success px-3 py-2">
+            <i class="fas fa-circle me-1"></i>
+            Team Chat
+        </span>
+
+    </div>
+
+    <!-- Chat Card -->
+    <div class="card border-0 shadow-sm">
+
+        <div class="card-header bg-white p-3">
+
+            <div class="d-flex align-items-center gap-2">
+
+                <div class="bg-primary bg-opacity-10
+                            text-primary rounded-circle
+                            d-flex align-items-center
+                            justify-content-center"
+                     style="width:45px;height:45px;">
+
+                    <i class="fas fa-users"></i>
+
+                </div>
+
+                <div>
+                    <h6 class="fw-bold mb-0">
+                        {{ project.name }} Team
+                    </h6>
+
+                    <small class="text-muted">
+                        Discuss project updates and work together
+                    </small>
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Messages -->
+        <div class="card-body p-0">
+
+            <div class="project-chat-window"
+                 id="projectChatWindow">
+
+                <div id="projectChatMessages">
+
+                    {% for item in messages %}
+
+                        <div class="project-chat-message
+                            {% if item.author_id == request.user.id %}
+                                mine
+                            {% endif %}"
+                            data-message-id="{{ item.id }}">
+
+                            <div class="project-chat-avatar">
+                                {{ item.author.username|first|upper }}
+                            </div>
+
+                            <div class="project-chat-body">
+
+                                <div class="project-chat-meta">
+                                    <strong>
+                                        {{ item.author.get_full_name|default:item.author.username }}
+                                    </strong>
+
+                                    · {{ item.created_at|date:"d M Y, h:i A" }}
+                                </div>
+
+                                <div class="project-chat-bubble">
+                                    {{ item.message }}
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    {% empty %}
+
+                        <div class="project-chat-empty"
+                             id="projectChatEmpty">
+
+                            <i class="fas fa-comments fa-3x mb-3"></i>
+
+                            <h5>No messages yet</h5>
+
+                            <p class="mb-0">
+                                Start the conversation with your project team.
+                            </p>
+
+                        </div>
+
+                    {% endfor %}
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Send Message -->
+        <div class="card-footer bg-white p-3">
+
+            <form method="POST"
+                  action="{% url 'ws_discussions:send_project_message' project.id %}"
+                  class="project-chat-form"
+                  id="projectChatForm">
+
+                {% csrf_token %}
+
+                <textarea
+                    name="message"
+                    id="projectMessageInput"
+                    class="form-control"
+                    placeholder="Write a message..."
+                    maxlength="2000"
+                    rows="2"
+                    required></textarea>
+
+                <button type="submit"
+                        class="btn btn-primary px-4">
+
+                    <i class="fas fa-paper-plane me-1"></i>
+                    Send
+
+                </button>
+
+            </form>
+
+            <small class="text-muted mt-2 d-block">
+                Press Enter to send · Shift + Enter for a new line
+            </small>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const messagesUrl =
+        "{% url 'ws_discussions:project_messages_json' project.id %}";
+
+    const messagesContainer =
+        document.getElementById("projectChatMessages");
+
+    const chatWindow =
+        document.getElementById("projectChatWindow");
+
+    const form =
+        document.getElementById("projectChatForm");
+
+    const input =
+        document.getElementById("projectMessageInput");
+
+    let isRefreshing = false;
+
+    function scrollToBottom() {
+        chatWindow.scrollTop = chatWindow.scrollHeight;
+    }
+
+    function createMessage(item) {
+
+        const message = document.createElement("div");
+
+        message.className = "project-chat-message";
+        message.dataset.messageId = String(item.id);
+
+        if (item.is_mine) {
+            message.classList.add("mine");
+        }
+
+        const avatar = document.createElement("div");
+        avatar.className = "project-chat-avatar";
+        avatar.textContent = item.author.charAt(0).toUpperCase();
+
+        const body = document.createElement("div");
+        body.className = "project-chat-body";
+
+        const meta = document.createElement("div");
+        meta.className = "project-chat-meta";
+
+        const author = document.createElement("strong");
+        author.textContent = item.author;
+
+        meta.appendChild(author);
+
+        meta.appendChild(
+            document.createTextNode(" · " + item.created_at)
+        );
+
+        const bubble = document.createElement("div");
+        bubble.className = "project-chat-bubble";
+        bubble.textContent = item.message;
+
+        body.appendChild(meta);
+        body.appendChild(bubble);
+
+        message.appendChild(avatar);
+        message.appendChild(body);
+
+        return message;
+    }
+
+    async function refreshMessages() {
+
+        if (isRefreshing) {
+            return;
+        }
+
+        isRefreshing = true;
+
+        try {
+
+            const response = await fetch(messagesUrl, {
+                credentials: "same-origin",
+                headers: {
+                    "X-Requested-With": "XMLHttpRequest"
+                }
+            });
+
+            if (!response.ok) {
+                return;
+            }
+
+            const result = await response.json();
+
+            const oldIds = new Set(
+                Array.from(
+                    messagesContainer.querySelectorAll(
+                        "[data-message-id]"
+                    )
+                ).map(element => element.dataset.messageId)
+            );
+
+            const shouldScroll =
+                chatWindow.scrollHeight -
+                chatWindow.scrollTop -
+                chatWindow.clientHeight < 100;
+
+            const empty = document.getElementById(
+                "projectChatEmpty"
+            );
+
+            if (empty && result.messages.length > 0) {
+                empty.remove();
+            }
+
+            result.messages.forEach(function (item) {
+
+                const id = String(item.id);
+
+                if (!oldIds.has(id)) {
+
+                    const message = createMessage(item);
+
+                    messagesContainer.appendChild(message);
+
+                    oldIds.add(id);
+                }
+
+            });
+
+            if (shouldScroll) {
+                scrollToBottom();
+            }
+
+        } catch (error) {
+
+            console.error(
+                "Unable to refresh project messages:",
+                error
+            );
+
+        } finally {
+            isRefreshing = false;
+        }
+    }
+
+    // Enter sends the message.
+    // Shift + Enter creates a new line.
+    form.addEventListener("keydown", function (event) {
+
+        if (
+            event.target === input &&
+            event.key === "Enter" &&
+            !event.shiftKey
+        ) {
+
+            event.preventDefault();
+
+            form.requestSubmit();
+        }
+
+    });
+
+    // Initial scroll and message refresh.
+    scrollToBottom();
+
+    refreshMessages();
+
+    // Automatically refresh every 3 seconds.
+    setInterval(refreshMessages, 3000);
+
+});
+</script>
+
+{% endblock %}

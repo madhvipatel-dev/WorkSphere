@@ -1,0 +1,239 @@
+
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container-fluid py-4">
+
+    <!-- Back Link -->
+    <a href="{% url 'client_dashboard' %}"
+       class="text-decoration-none text-muted">
+
+        <i class="fas fa-arrow-left me-2"></i>
+        Back to Client Dashboard
+
+    </a>
+
+    <!-- Header -->
+    <div class="d-flex justify-content-between
+                align-items-center flex-wrap gap-3 mt-3 mb-4">
+
+        <div>
+            <h1 class="fw-bold mb-1">
+                {{ project.name }}
+            </h1>
+
+            <p class="text-muted mb-0">
+                Project details and progress tracking
+            </p>
+        </div>
+
+        <span class="badge bg-primary fs-6 px-3 py-2">
+            Read-Only
+        </span>
+
+    </div>
+
+    <div class="row g-4">
+
+        <!-- Main Content -->
+        <div class="col-lg-8">
+
+            <!-- Project Description -->
+            <div class="card border-0 shadow-sm mb-4">
+
+                <div class="card-body p-4">
+
+                    <h5 class="fw-bold mb-3">
+                        Project Description
+                    </h5>
+
+                    {% if project.description %}
+
+                        <p class="text-muted">
+                            {{ project.description|linebreaksbr }}
+                        </p>
+
+                    {% else %}
+
+                        <p class="text-muted">
+                            No description available.
+                        </p>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+            <!-- Project Progress -->
+            <div class="card border-0 shadow-sm mb-4">
+
+                <div class="card-body p-4">
+
+                    <h5 class="fw-bold mb-3">
+                        Project Progress
+                    </h5>
+
+                    <div class="d-flex justify-content-between mb-2">
+
+                        <span>
+                            Overall Completion
+                        </span>
+
+                        <strong class="text-primary">
+                            {{ project.progress_percentage }}%
+                        </strong>
+
+                    </div>
+
+                    <div class="progress mb-3"
+                         style="height: 14px;">
+
+                        
+<div
+    class="progress-bar bg-primary"
+    role="progressbar"
+    data-progress="{{ project.dashboard_progress }}"
+    aria-valuenow="{{ project.dashboard_progress }}"
+    aria-valuemin="0"
+    aria-valuemax="100">
+</div>
+
+
+                    </div>
+
+                    <p class="text-muted mb-0">
+                        {{ project.completed_tasks }}
+                        of
+                        {{ project.total_tasks }}
+                        tasks completed
+                    </p>
+
+                </div>
+
+            </div>
+
+            <!-- Task Progress -->
+            <div class="card border-0 shadow-sm">
+
+                <div class="card-body p-4">
+
+                    <h5 class="fw-bold mb-4">
+                        Task Progress
+                    </h5>
+
+                    {% for task in tasks %}
+
+                        <div class="border-bottom pb-3 mb-3">
+
+                            <div class="d-flex justify-content-between
+                                        align-items-start gap-2">
+
+                                <div>
+                                    <h6 class="fw-bold mb-1">
+                                        {{ task.title }}
+                                    </h6>
+
+                                    {% if task.description %}
+                                        <p class="text-muted small mb-2">
+                                            {{ task.description|truncatewords:30 }}
+                                        </p>
+                                    {% endif %}
+                                </div>
+
+                                <span class="badge
+                                    {% if task.status == 'completed' %}
+                                        bg-success
+                                    {% elif task.status == 'in_progress' %}
+                                        bg-primary
+                                    {% elif task.status == 'blocked' %}
+                                        bg-danger
+                                    {% else %}
+                                        bg-secondary
+                                    {% endif %}">
+
+                                    {{ task.get_status_display }}
+
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                    {% empty %}
+
+                        <p class="text-muted mb-0">
+                            No tasks have been added to this project.
+                        </p>
+
+                    {% endfor %}
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+
+            <div class="card border-0 shadow-sm">
+
+                <div class="card-body p-4">
+
+                    <h5 class="fw-bold mb-4">
+                        Project Information
+                    </h5>
+
+                    <p>
+                        <strong>Owner:</strong>
+                        {{ project.owner.username }}
+                    </p>
+
+                    <p>
+                        <strong>Status:</strong>
+                        {{ project.get_status_display }}
+                    </p>
+
+                    <p>
+                        <strong>Start Date:</strong>
+
+                        {% if project.start_date %}
+                            {{ project.start_date|date:"d M Y" }}
+                        {% else %}
+                            Not set
+                        {% endif %}
+                    </p>
+
+                    <p>
+                        <strong>Deadline:</strong>
+
+                        {% if project.deadline %}
+                            {{ project.deadline|date:"d M Y" }}
+                        {% else %}
+                            Not set
+                        {% endif %}
+                    </p>
+
+                    <p>
+                        <strong>Created:</strong>
+                        {{ project.created_at|date:"d M Y" }}
+                    </p>
+
+                    <p class="mb-0">
+                        <strong>Last Updated:</strong>
+                        {{ project.updated_at|date:"d M Y" }}
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

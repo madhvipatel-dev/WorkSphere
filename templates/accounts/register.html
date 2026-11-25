@@ -1,0 +1,263 @@
+﻿{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#10152b">
+    <meta name="description" content="Create your WorkSphere account and organize your team's work.">
+    <title>Create Account | WorkSphere</title>
+    <link rel="stylesheet" href="{% static 'css/auth.css' %}">
+</head>
+
+<body class="auth-body">
+<div class="auth-layout">
+
+    <!-- LEFT: BRANDING PANEL -->
+    <aside class="brand-panel">
+        <a class="brand" href="/">
+            <span class="brand-icon">W</span>
+            <span>Work<span class="brand-light">Sphere</span></span>
+        </a>
+
+        <div class="brand-main">
+            <div class="brand-pill">
+                <span class="status-dot"></span>
+                BUILT FOR BETTER TEAMWORK
+            </div>
+
+            <h1>
+                Bring your team<br>
+                <span>together.</span>
+            </h1>
+
+            
+
+            
+        </div>
+
+        <div class="brand-bottom">
+           
+        </div>
+    </aside>
+
+    <!-- RIGHT: REGISTRATION FORM -->
+    <main class="form-panel">
+        
+
+        <section class="auth-card register-card">
+
+            
+
+            <header class="form-heading">
+                <h2>Create your account.</h2>
+                
+            </header>
+
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="notice notice-{{ message.tags|default:'info' }}"
+                         role="status">
+                        <span class="notice-icon">âœ“</span>
+                        <span>{{ message }}</span>
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            {% if form.non_field_errors %}
+                <div class="form-alert" role="alert">
+                    {{ form.non_field_errors }}
+                </div>
+            {% endif %}
+
+            <form method="post" class="auth-form" novalidate>
+                {% csrf_token %}
+
+                <!-- USERNAME -->
+                <div class="field">
+                    <label for="{{ form.username.id_for_label }}">
+                        Username
+                    </label>
+
+                    {{ form.username }}
+
+                    {% for error in form.username.errors %}
+                        <small class="field-error">{{ error }}</small>
+                    {% endfor %}
+                </div>
+
+                <!-- EMAIL, IF PROVIDED BY THE REGISTRATION FORM -->
+                {% if form.email %}
+                    <div class="field">
+                        <label for="{{ form.email.id_for_label }}">
+                            Email address
+                        </label>
+
+                        {{ form.email }}
+
+                        {% for error in form.email.errors %}
+                            <small class="field-error">{{ error }}</small>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                <!-- FIRST NAME, IF PROVIDED BY THE REGISTRATION FORM -->
+                {% if form.first_name %}
+                    <div class="field">
+                        <label for="{{ form.first_name.id_for_label }}">
+                            First name
+                        </label>
+
+                        {{ form.first_name }}
+
+                        {% for error in form.first_name.errors %}
+                            <small class="field-error">{{ error }}</small>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                <!-- LAST NAME, IF PROVIDED BY THE REGISTRATION FORM -->
+                {% if form.last_name %}
+                    <div class="field">
+                        <label for="{{ form.last_name.id_for_label }}">
+                            Last name
+                        </label>
+
+                        {{ form.last_name }}
+
+                        {% for error in form.last_name.errors %}
+                            <small class="field-error">{{ error }}</small>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                <!-- PASSWORD -->
+                <div class="field">
+                    <label for="{{ form.password1.id_for_label }}">
+                        Password
+                    </label>
+
+                    <div class="password-wrap">
+                        {{ form.password1 }}
+
+                        <button
+                            type="button"
+                            class="password-toggle"
+                            data-password-target="{{ form.password1.id_for_label }}"
+                            aria-label="Show password">
+                            Show
+                        </button>
+                    </div>
+
+                    {% for error in form.password1.errors %}
+                        <small class="field-error">{{ error }}</small>
+                    {% endfor %}
+
+                    {% if form.password1.help_text %}
+                        <div class="password-help">
+                            {{ form.password1.help_text|safe }}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- CONFIRM PASSWORD -->
+                {% if form.password2 %}
+                    <div class="field">
+                        <label for="{{ form.password2.id_for_label }}">
+                            Confirm password
+                        </label>
+
+                        <div class="password-wrap">
+                            {{ form.password2 }}
+
+                            <button
+                                type="button"
+                                class="password-toggle"
+                                data-password-target="{{ form.password2.id_for_label }}"
+                                aria-label="Show password">
+                                Show
+                            </button>
+                        </div>
+
+                        {% for error in form.password2.errors %}
+                            <small class="field-error">{{ error }}</small>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                <!-- DISPLAY ANY OTHER FORM FIELDS NOT LISTED ABOVE -->
+                {% for field in form %}
+                    {% if field.name != "username" and field.name != "email" and field.name != "first_name" and field.name != "last_name" and field.name != "password1" and field.name != "password2" %}
+                        <div class="field">
+                            <label for="{{ field.id_for_label }}">
+                                {{ field.label }}
+                            </label>
+
+                            {{ field }}
+
+                            {% for error in field.errors %}
+                                <small class="field-error">{{ error }}</small>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                {% endfor %}
+
+                <button type="submit" class="primary-button">
+                    <span>Create my account</span>
+                    
+                </button>
+
+                
+            </form>
+
+            <div class="auth-divider">
+                <span>ALREADY HAVE AN ACCOUNT?</span>
+            </div>
+
+            <p class="auth-switch">
+                Welcome back.
+                <a href="{% url 'login' %}">
+                    Sign in 
+                </a>
+            </p>
+
+            <div class="security-note">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <rect x="4" y="10" width="16" height="11" rx="2"/>
+                    <path d="M8 10V7a4 4 0 0 1 8 0v3"/>
+                    <path d="M12 14v3"/>
+                </svg>
+                
+            </div>
+        </section>
+
+        <footer class="mobile-footer">
+            Â© {% now "Y" %} WorkSphere
+        </footer>
+    </main>
+</div>
+
+<script>
+document.querySelectorAll(".password-toggle").forEach(function (button) {
+    button.addEventListener("click", function () {
+        const field = document.getElementById(
+            button.getAttribute("data-password-target")
+        );
+
+        if (!field) return;
+
+        const showing = field.type === "text";
+
+        field.type = showing ? "password" : "text";
+        button.textContent = showing ? "Show" : "Hide";
+
+        button.setAttribute(
+            "aria-label",
+            showing ? "Show password" : "Hide password"
+
+        );
+    });
+});
+</script>
+</body>
+</html>

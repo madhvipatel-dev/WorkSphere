@@ -1,0 +1,246 @@
+
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container-fluid py-4">
+
+    <div class="mb-4">
+        <a href="{% url 'project_list' %}"
+           class="text-decoration-none text-muted">
+            <i class="fas fa-arrow-left me-2"></i>
+            Back to Projects
+        </a>
+
+        <h1 class="fw-bold mt-3 mb-1">
+            {{ page_title }}
+        </h1>
+
+        <p class="text-muted mb-0">
+            {% if project %}
+                Update your project information and keep your team aligned.
+            {% else %}
+                Add a new project to your WorkSphere workspace.
+            {% endif %}
+        </p>
+    </div>
+
+    <div class="row g-4">
+
+        <div class="col-lg-8">
+
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+
+                        {% if form.non_field_errors %}
+                            <div class="alert alert-danger">
+                                {% for error in form.non_field_errors %}
+                                    <div>{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+
+                        <div class="mb-4">
+                            <label for="{{ form.name.id_for_label }}"
+                                   class="form-label fw-semibold">
+                                Project Name
+                                <span class="text-danger">*</span>
+                            </label>
+
+                            {{ form.name }}
+
+                            {% for error in form.name.errors %}
+                                <div class="text-danger small mt-1">
+                                    {{ error }}
+                                </div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="{{ form.description.id_for_label }}"
+                                   class="form-label fw-semibold">
+                                Description
+                            </label>
+
+                            {{ form.description }}
+
+                            {% for error in form.description.errors %}
+                                <div class="text-danger small mt-1">
+                                    {{ error }}
+                                </div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="row">
+
+                            <div class="col-md-6 mb-4">
+                                <label for="{{ form.start_date.id_for_label }}"
+                                       class="form-label fw-semibold">
+                                    Start Date
+                                </label>
+
+                                {{ form.start_date }}
+
+                                {% for error in form.start_date.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {{ error }}
+                                    </div>
+                                {% endfor %}
+                            </div>
+
+                            <div class="col-md-6 mb-4">
+                                <label for="{{ form.deadline.id_for_label }}"
+                                       class="form-label fw-semibold">
+                                    Deadline
+                                </label>
+
+                                {{ form.deadline }}
+
+                                {% for error in form.deadline.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {{ error }}
+                                    </div>
+                                {% endfor %}
+                            </div>
+
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="{{ form.status.id_for_label }}"
+                                   class="form-label fw-semibold">
+                                Project Status
+                            </label>
+
+                            {{ form.status }}
+
+                            {% for error in form.status.errors %}
+                                <div class="text-danger small mt-1">
+                                    {{ error }}
+                                </div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="{{ form.client.id_for_label }}"
+                                   class="form-label fw-semibold">
+                                <i class="fas fa-user-tie text-primary me-2"></i>
+                                Assigned Client
+                            </label>
+
+                            <p class="small text-muted mb-2">
+                                Assign an approved Client to this project.
+                                The Client can view project information and
+                                verified progress, but cannot edit or manage
+                                the project.
+                            </p>
+
+                            {{ form.client }}
+
+                            {% for error in form.client.errors %}
+                                <div class="text-danger small mt-1">
+                                    {{ error }}
+                                </div>
+                            {% endfor %}
+
+                            {% if not form.client.field.queryset.exists %}
+                                <div class="alert alert-warning mt-3 mb-0">
+                                    No active, approved Client accounts are
+                                    available. Create or approve a Client
+                                    account first.
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="d-flex flex-wrap gap-2">
+
+                            <button type="submit"
+                                    class="btn btn-primary px-4">
+                                <i class="fas fa-save me-2"></i>
+                                {{ button_text|default:"Save Project" }}
+                            </button>
+
+                            {% if project %}
+                                <a href="{% url 'project_detail' project.pk %}"
+                                   class="btn btn-light px-4">
+                                    Cancel
+                                </a>
+                            {% else %}
+                                <a href="{% url 'project_list' %}"
+                                   class="btn btn-light px-4">
+                                    Cancel
+                                </a>
+                            {% endif %}
+
+                        </div>
+
+                    </form>
+
+                </div>
+            </div>
+
+        </div>
+
+        <div class="col-lg-4">
+
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+
+                    <div class="text-primary mb-3">
+                        <i class="fas fa-lightbulb fa-2x"></i>
+                    </div>
+
+                    <h5 class="fw-bold">
+                        Project Tips
+                    </h5>
+
+                    <p class="text-muted">
+                        Keep your project information clear and
+                        specific so your team can understand
+                        the project goals easily.
+                    </p>
+
+                    <hr>
+
+                    <div class="mb-3">
+                        <strong>Project Name</strong>
+                        <p class="text-muted small mb-0">
+                            Use a short and meaningful name.
+                        </p>
+                    </div>
+
+                    <div class="mb-3">
+                        <strong>Description</strong>
+                        <p class="text-muted small mb-0">
+                            Explain the main purpose of the project.
+                        </p>
+                    </div>
+
+                    <div class="mb-3">
+                        <strong>Deadline</strong>
+                        <p class="text-muted small mb-0">
+                            Set a realistic completion date.
+                        </p>
+                    </div>
+
+                    <div>
+                        <strong>Assigned Client</strong>
+                        <p class="text-muted small mb-0">
+                            Select an approved Client account
+                            to provide read-only access to
+                            project progress.
+                        </p>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

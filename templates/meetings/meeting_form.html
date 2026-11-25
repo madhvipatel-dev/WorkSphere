@@ -1,0 +1,469 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container-fluid py-4">
+
+    <!-- Back Link -->
+
+    <div class="mb-3">
+
+        <a href="{% url 'meeting_list' %}"
+           class="text-decoration-none text-muted">
+
+            <i class="fas fa-arrow-left me-2"></i>
+            Back to Meetings
+
+        </a>
+
+    </div>
+
+
+    <!-- Page Header -->
+
+    <div class="mb-4">
+
+        <h1 class="fw-bold mb-1">
+            {{ page_title }}
+        </h1>
+
+        <p class="text-muted mb-0">
+            Schedule a meeting and invite your project team.
+        </p>
+
+    </div>
+
+
+    <div class="row g-4">
+
+
+        <!-- Main Form -->
+
+        <div class="col-lg-8">
+
+            <div class="card border-0 shadow-sm">
+
+                <div class="card-body p-4">
+
+                    <form method="POST">
+
+                        {% csrf_token %}
+
+
+                        <!-- Form Errors -->
+
+                        {% if form.non_field_errors %}
+
+                            <div class="alert alert-danger">
+
+                                <i class="fas fa-exclamation-circle me-2"></i>
+
+                                {{ form.non_field_errors }}
+
+                            </div>
+
+                        {% endif %}
+
+
+                        <!-- Meeting Title -->
+
+                        <div class="mb-4">
+
+                            <label class="form-label fw-semibold">
+                                Meeting Title
+                            </label>
+
+                            {{ form.title }}
+
+                            {% if form.title.errors %}
+
+                                <div class="text-danger small mt-1">
+                                    {{ form.title.errors }}
+                                </div>
+
+                            {% endif %}
+
+                        </div>
+
+
+                        <!-- Description -->
+
+                        <div class="mb-4">
+
+                            <label class="form-label fw-semibold">
+                                Description
+                            </label>
+
+                            {{ form.description }}
+
+                            {% if form.description.errors %}
+
+                                <div class="text-danger small mt-1">
+                                    {{ form.description.errors }}
+                                </div>
+
+                            {% endif %}
+
+                        </div>
+
+
+                        <!-- Project -->
+
+                        <div class="mb-4">
+
+                            <label class="form-label fw-semibold">
+                                Project
+                            </label>
+
+                            {{ form.project }}
+
+                            <small class="text-muted">
+                                Select the project related to this meeting.
+                            </small>
+
+                            {% if form.project.errors %}
+
+                                <div class="text-danger small mt-1">
+                                    {{ form.project.errors }}
+                                </div>
+
+                            {% endif %}
+
+                        </div>
+
+
+                        <!-- Participants -->
+
+                        <div class="mb-4">
+
+                            <label class="form-label fw-semibold">
+                                Participants
+                            </label>
+
+                            {{ form.participants }}
+
+                            <small class="text-muted">
+                                Hold Ctrl and select multiple team members.
+                            </small>
+
+                            {% if form.participants.errors %}
+
+                                <div class="text-danger small mt-1">
+                                    {{ form.participants.errors }}
+                                </div>
+
+                            {% endif %}
+
+                        </div>
+
+
+                        <!-- Date and Time -->
+
+                        <div class="row g-3 mb-4">
+
+
+                            <!-- Date -->
+
+                            <div class="col-md-4">
+
+                                <label class="form-label fw-semibold">
+                                    Meeting Date
+                                </label>
+
+                                {{ form.meeting_date }}
+
+                                {% if form.meeting_date.errors %}
+
+                                    <div class="text-danger small mt-1">
+                                        {{ form.meeting_date.errors }}
+                                    </div>
+
+                                {% endif %}
+
+                            </div>
+
+
+                            <!-- Start Time -->
+
+                            <div class="col-md-4">
+
+                                <label class="form-label fw-semibold">
+                                    Start Time
+                                </label>
+
+                                {{ form.start_time }}
+
+                                {% if form.start_time.errors %}
+
+                                    <div class="text-danger small mt-1">
+                                        {{ form.start_time.errors }}
+                                    </div>
+
+                                {% endif %}
+
+                            </div>
+
+
+                            <!-- End Time -->
+
+                            <div class="col-md-4">
+
+                                <label class="form-label fw-semibold">
+                                    End Time
+                                </label>
+
+                                {{ form.end_time }}
+
+                                {% if form.end_time.errors %}
+
+                                    <div class="text-danger small mt-1">
+                                        {{ form.end_time.errors }}
+                                    </div>
+
+                                {% endif %}
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- Meeting Link -->
+
+                        <div class="mb-4">
+
+                            <label class="form-label fw-semibold">
+                                Meeting Link
+                            </label>
+
+                            {{ form.meeting_link }}
+
+                            <small class="text-muted">
+                                Example: Google Meet, Microsoft Teams, Zoom, etc.
+                            </small>
+
+                            {% if form.meeting_link.errors %}
+
+                                <div class="text-danger small mt-1">
+                                    {{ form.meeting_link.errors }}
+                                </div>
+
+                            {% endif %}
+
+                        </div>
+
+
+                        <!-- Location -->
+
+                        <div class="mb-4">
+
+                            <label class="form-label fw-semibold">
+                                Location
+                            </label>
+
+                            {{ form.location }}
+
+                            {% if form.location.errors %}
+
+                                <div class="text-danger small mt-1">
+                                    {{ form.location.errors }}
+                                </div>
+
+                            {% endif %}
+
+                        </div>
+
+
+                        <!-- Status -->
+
+                        <div class="mb-4">
+
+                            <label class="form-label fw-semibold">
+                                Status
+                            </label>
+
+                            {{ form.status }}
+
+                            {% if form.status.errors %}
+
+                                <div class="text-danger small mt-1">
+                                    {{ form.status.errors }}
+                                </div>
+
+                            {% endif %}
+
+                        </div>
+
+
+                        <!-- Buttons -->
+
+                        <div class="d-flex gap-2 pt-2">
+
+                            <button type="submit"
+                                    class="btn btn-primary">
+
+                                {% if page_title == "Edit Meeting" %}
+
+                                    <i class="fas fa-save me-2"></i>
+
+                                {% else %}
+
+                                    <i class="fas fa-calendar-plus me-2"></i>
+
+                                {% endif %}
+
+                                {{ button_text }}
+
+                            </button>
+
+
+                            <a href="{% url 'meeting_list' %}"
+                               class="btn btn-outline-secondary">
+
+                                Cancel
+
+                            </a>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Guidelines -->
+
+        <div class="col-lg-4">
+
+            <div class="card border-0 shadow-sm">
+
+                <div class="card-body p-4">
+
+                    <h5 class="fw-bold mb-4">
+
+                        <i class="fas fa-info-circle
+                                  text-primary me-2"></i>
+
+                        Meeting Guidelines
+
+                    </h5>
+
+
+                    <div class="mb-4">
+
+                        <strong class="d-block mb-1">
+                            Meeting Title
+                        </strong>
+
+                        <small class="text-muted">
+                            Use a short and clear title that explains
+                            the purpose of the meeting.
+                        </small>
+
+                    </div>
+
+
+                    <div class="mb-4">
+
+                        <strong class="d-block mb-1">
+                            Project
+                        </strong>
+
+                        <small class="text-muted">
+                            Select the project associated with this meeting.
+                        </small>
+
+                    </div>
+
+
+                    <div class="mb-4">
+
+                        <strong class="d-block mb-1">
+                            Participants
+                        </strong>
+
+                        <small class="text-muted">
+                            Invite members who are part of the selected project.
+                        </small>
+
+                    </div>
+
+
+                    <div class="mb-4">
+
+                        <strong class="d-block mb-1">
+                            Date & Time
+                        </strong>
+
+                        <small class="text-muted">
+                            Set a clear date and time so participants
+                            know when to join.
+                        </small>
+
+                    </div>
+
+
+                    <div>
+
+                        <strong class="d-block mb-1">
+                            Meeting Link
+                        </strong>
+
+                        <small class="text-muted">
+                            Add a Google Meet, Zoom, or Microsoft Teams
+                            link for online meetings.
+                        </small>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- Quick Tip -->
+
+            <div class="card border-0 shadow-sm mt-4">
+
+                <div class="card-body p-4">
+
+                    <div class="d-flex">
+
+                        <div class="text-primary me-3">
+
+                            <i class="fas fa-lightbulb fa-lg"></i>
+
+                        </div>
+
+                        <div>
+
+                            <h6 class="fw-bold">
+                                Quick Tip
+                            </h6>
+
+                            <p class="text-muted small mb-0">
+
+                                Keep meeting descriptions short
+                                and mention the main topics that
+                                will be discussed.
+
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

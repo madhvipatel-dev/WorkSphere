@@ -1,0 +1,575 @@
+
+{% extends "base.html" %}
+
+{% block title %}Files | WorkSphere{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid py-4">
+
+    <!-- ================================================== -->
+    <!-- PAGE HEADER -->
+    <!-- ================================================== -->
+
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+
+        <div>
+            <h2 class="fw-bold mb-1">
+                <i class="fa-solid fa-folder-open text-primary me-2"></i>
+                File Management
+            </h2>
+
+            <p class="text-muted mb-0">
+                Access and manage documents shared with your projects.
+            </p>
+        </div>
+
+        {% if can_upload_file %}
+        <a href="{% url 'file_upload' %}"
+           class="btn btn-primary">
+
+            <i class="fa-solid fa-cloud-arrow-up me-2"></i>
+            Upload File
+
+        </a>
+        {% endif %}
+
+    </div>
+
+
+    <!-- ================================================== -->
+    <!-- FILE STATISTICS -->
+    <!-- ================================================== -->
+
+    <div class="row g-3 mb-4">
+
+        <div class="col-md-4">
+
+            <div class="card border-0 shadow-sm h-100">
+
+                <div class="card-body d-flex align-items-center">
+
+                    <div class="rounded-3 bg-primary bg-opacity-10 p-3 me-3">
+                        <i class="fa-solid fa-file-lines text-primary fs-4"></i>
+                    </div>
+
+                    <div>
+                        <h6 class="text-muted mb-1">
+                            Total Files
+                        </h6>
+
+                        <h3 class="fw-bold mb-0" id="totalFiles">
+                            0
+                        </h3>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-md-4">
+
+            <div class="card border-0 shadow-sm h-100">
+
+                <div class="card-body d-flex align-items-center">
+
+                    <div class="rounded-3 bg-success bg-opacity-10 p-3 me-3">
+                        <i class="fa-solid fa-cloud-arrow-up text-success fs-4"></i>
+                    </div>
+
+                    <div>
+                        <h6 class="text-muted mb-1">
+                            Uploaded By You
+                        </h6>
+
+                        <h3 class="fw-bold mb-0" id="myFiles">
+                            0
+                        </h3>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-md-4">
+
+            <div class="card border-0 shadow-sm h-100">
+
+                <div class="card-body d-flex align-items-center">
+
+                    <div class="rounded-3 bg-info bg-opacity-10 p-3 me-3">
+                        <i class="fa-solid fa-folder-tree text-info fs-4"></i>
+                    </div>
+
+                    <div>
+                        <h6 class="text-muted mb-1">
+                            Projects With Files
+                        </h6>
+
+                        <h3 class="fw-bold mb-0" id="projectCount">
+                            0
+                        </h3>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ================================================== -->
+    <!-- FILES CARD -->
+    <!-- ================================================== -->
+
+    <div class="card border-0 shadow-sm">
+
+        <div class="card-header bg-white border-0 py-3">
+
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+
+                <div>
+                    <h5 class="fw-bold mb-1">
+                        Project Documents
+                    </h5>
+
+                    <small class="text-muted">
+                        Files available through your current project access
+                    </small>
+                </div>
+
+                <span class="badge bg-light text-dark"
+                      id="visibleFileCount">
+                    0 files
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <div class="card-body">
+
+            <!-- SEARCH AND FILTER -->
+
+            <div class="row g-3 mb-4">
+
+                <div class="col-md-7">
+
+                    <div class="input-group">
+
+                        <span class="input-group-text bg-white">
+                            <i class="fa-solid fa-magnifying-glass text-muted"></i>
+                        </span>
+
+                        <input
+                            type="search"
+                            id="fileSearch"
+                            class="form-control"
+                            placeholder="Search files, descriptions, or uploaders..."
+                            aria-label="Search files"
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <div class="col-md-5">
+
+                    <select
+                        id="projectFilter"
+                        class="form-select"
+                        aria-label="Filter by project"
+                    >
+                        <option value="">
+                            All Projects
+                        </option>
+                    </select>
+
+                </div>
+
+            </div>
+
+
+            <!-- FILE TABLE -->
+
+            <div class="table-responsive">
+
+                <table class="table table-hover align-middle mb-0">
+
+                    <thead class="table-light">
+
+                        <tr>
+                            <th>File</th>
+                            <th>Project</th>
+                            <th>Uploaded By</th>
+                            <th>Date</th>
+                            <th class="text-end">
+                                Actions
+                            </th>
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody id="filesTableBody">
+
+                        {% for project_file in files %}
+
+                        <tr
+                            class="file-row"
+                            data-project-id="{{ project_file.project_id }}"
+                            data-project-name="{{ project_file.project.name }}"
+                            data-title="{{ project_file.title }}"
+                            data-description="{{ project_file.description }}"
+                            data-uploader="{{ project_file.uploaded_by.username }}"
+                            data-owner-id="{{ project_file.project.owner_id }}"
+                            data-uploader-id="{{ project_file.uploaded_by_id }}"
+                        >
+
+                            <!-- FILE -->
+
+                            <td>
+
+                                <div class="d-flex align-items-center">
+
+                                    <div class="rounded-3 bg-primary bg-opacity-10 p-2 me-3">
+
+                                        <i class="fa-solid fa-file-lines text-primary"></i>
+
+                                    </div>
+
+                                    <div>
+
+                                        <a
+                                            href="{% url 'file_detail' project_file.id %}"
+                                            class="fw-semibold text-decoration-none"
+                                        >
+                                            {{ project_file.title }}
+                                        </a>
+
+                                        {% if project_file.description %}
+
+                                        <div class="text-muted small">
+                                            {{ project_file.description|truncatechars:65 }}
+                                        </div>
+
+                                        {% endif %}
+
+                                    </div>
+
+                                </div>
+
+                            </td>
+
+
+                            <!-- PROJECT -->
+
+                            <td>
+
+                                <span class="badge bg-light text-dark border">
+
+                                    <i class="fa-solid fa-folder me-1"></i>
+
+                                    {{ project_file.project.name }}
+
+                                </span>
+
+                            </td>
+
+
+                            <!-- UPLOADER -->
+
+                            <td>
+
+                                <div class="d-flex align-items-center">
+
+                                    <div
+                                        class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center me-2"
+                                        style="width:34px;height:34px;min-width:34px;"
+                                    >
+                                        {{ project_file.uploaded_by.username|first|upper }}
+                                    </div>
+
+                                    <span>
+                                        {{ project_file.uploaded_by.username }}
+                                    </span>
+
+                                </div>
+
+                            </td>
+
+
+                            <!-- DATE -->
+
+                            <td>
+
+                                <span class="text-muted small">
+
+                                    {{ project_file.uploaded_at|date:"d M Y" }}
+
+                                </span>
+
+                            </td>
+
+
+                            <!-- ACTIONS -->
+
+                            <td class="text-end">
+
+                                <div class="d-inline-flex flex-wrap justify-content-end gap-1">
+
+                                    <a
+                                        href="{% url 'file_detail' project_file.id %}"
+                                        class="btn btn-sm btn-outline-primary"
+                                        title="View file details"
+                                        aria-label="View {{ project_file.title }}"
+                                    >
+                                        <i class="fa-solid fa-eye"></i>
+                                    </a>
+
+
+                                    <a
+                                        href="{% url 'file_download' project_file.id %}"
+                                        class="btn btn-sm btn-outline-success"
+                                        title="Download file"
+                                        aria-label="Download {{ project_file.title }}"
+                                    >
+                                        <i class="fa-solid fa-download"></i>
+                                    </a>
+
+
+                                    {% if user.is_superuser or project_file.project.owner_id == user.id or project_file.uploaded_by_id == user.id %}
+
+                                    <a
+                                        href="{% url 'file_edit' project_file.id %}"
+                                        class="btn btn-sm btn-outline-warning"
+                                        title="Edit file"
+                                        aria-label="Edit {{ project_file.title }}"
+                                    >
+                                        <i class="fa-solid fa-pen"></i>
+                                    </a>
+
+
+                                    <a
+                                        href="{% url 'file_delete' project_file.id %}"
+                                        class="btn btn-sm btn-outline-danger"
+                                        title="Delete file"
+                                        aria-label="Delete {{ project_file.title }}"
+                                    >
+                                        <i class="fa-solid fa-trash"></i>
+                                    </a>
+
+                                    {% endif %}
+
+                                </div>
+
+                            </td>
+
+                        </tr>
+
+                        {% empty %}
+
+                        <tr id="noFilesRow">
+
+                            <td colspan="5" class="text-center py-5">
+
+                                <div class="mb-3">
+                                    <i class="fa-solid fa-folder-open text-primary fs-1"></i>
+                                </div>
+
+                                <h5 class="fw-bold">
+                                    No files yet
+                                </h5>
+
+                                <p class="text-muted">
+                                    No documents are currently available to your projects.
+                                </p>
+
+                                {% if can_upload_file %}
+
+                                <a
+                                    href="{% url 'file_upload' %}"
+                                    class="btn btn-primary"
+                                >
+                                    <i class="fa-solid fa-cloud-arrow-up me-2"></i>
+                                    Upload Your First File
+                                </a>
+
+                                {% endif %}
+
+                            </td>
+
+                        </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+
+            <!-- FILTER EMPTY STATE -->
+
+            <div
+                id="noSearchResults"
+                class="text-center py-5 d-none"
+            >
+
+                <i class="fa-solid fa-magnifying-glass text-muted fs-1 mb-3"></i>
+
+                <h5 class="fw-bold">
+                    No matching files
+                </h5>
+
+                <p class="text-muted mb-0">
+                    Try another search or choose a different project.
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ====================================================== -->
+<!-- FILE LIST JAVASCRIPT -->
+<!-- ====================================================== -->
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const rows = Array.from(
+        document.querySelectorAll(".file-row")
+    );
+
+    const searchInput = document.getElementById("fileSearch");
+    const projectFilter = document.getElementById("projectFilter");
+
+    const totalFiles = document.getElementById("totalFiles");
+    const myFiles = document.getElementById("myFiles");
+    const projectCount = document.getElementById("projectCount");
+
+    const visibleFileCount = document.getElementById("visibleFileCount");
+    const noSearchResults = document.getElementById("noSearchResults");
+
+    const currentUserId = "{{ user.id|escapejs }}";
+
+    const projects = new Map();
+
+    let myUploadCount = 0;
+
+    rows.forEach(function (row) {
+
+        const projectId = row.dataset.projectId;
+        const projectName = row.dataset.projectName;
+
+        projects.set(projectId, projectName);
+
+        if (row.dataset.uploaderId === currentUserId) {
+            myUploadCount++;
+        }
+
+    });
+
+    // Populate project dropdown.
+    Array.from(projects.entries())
+        .sort(function (a, b) {
+            return a[1].localeCompare(b[1]);
+        })
+        .forEach(function (entry) {
+
+            const option = document.createElement("option");
+
+            option.value = entry[0];
+            option.textContent = entry[1];
+
+            projectFilter.appendChild(option);
+
+        });
+
+    // Statistics.
+    totalFiles.textContent = rows.length;
+    myFiles.textContent = myUploadCount;
+    projectCount.textContent = projects.size;
+
+
+    function filterFiles() {
+
+        const searchTerm = searchInput.value
+            .trim()
+            .toLowerCase();
+
+        const selectedProject = projectFilter.value;
+
+        let visibleCount = 0;
+
+        rows.forEach(function (row) {
+
+            const searchableText = [
+                row.dataset.title,
+                row.dataset.description,
+                row.dataset.uploader,
+                row.dataset.projectName
+            ].join(" ").toLowerCase();
+
+            const matchesSearch = searchableText.includes(
+                searchTerm
+            );
+
+            const matchesProject = (
+                !selectedProject ||
+                row.dataset.projectId === selectedProject
+            );
+
+            const isVisible = matchesSearch && matchesProject;
+
+            row.classList.toggle("d-none", !isVisible);
+
+            if (isVisible) {
+                visibleCount++;
+            }
+
+        });
+
+        visibleFileCount.textContent =
+            visibleCount +
+            (visibleCount === 1 ? " file" : " files");
+
+        noSearchResults.classList.toggle(
+            "d-none",
+            visibleCount !== 0 || rows.length === 0
+        );
+
+    }
+
+    searchInput.addEventListener(
+        "input",
+        filterFiles
+    );
+
+    projectFilter.addEventListener(
+        "change",
+        filterFiles
+    );
+
+    filterFiles();
+
+});
+</script>
+
+{% endblock %}

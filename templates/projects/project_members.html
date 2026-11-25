@@ -1,0 +1,187 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Team - WorkSphere{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid">
+
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <div>
+            <a href="{% url 'project_detail' project.id %}"
+               class="text-decoration-none text-muted mb-2 d-inline-block">
+
+                <i class="fas fa-arrow-left me-2"></i>
+                Back to Project
+            </a>
+
+            <h2 class="fw-bold mb-1">
+                Manage Team
+            </h2>
+
+            <p class="text-muted mb-0">
+                Add or remove members from
+                <strong>{{ project.name }}</strong>
+            </p>
+        </div>
+
+    </div>
+
+
+    <!-- Team Management Card -->
+    <div class="row">
+
+        <div class="col-lg-8">
+
+            <div class="card border-0 shadow-sm">
+
+                <div class="card-body p-4">
+
+                    <div class="d-flex align-items-center mb-4">
+
+                        <div class="bg-primary bg-opacity-10
+                                    text-primary rounded-circle
+                                    d-flex align-items-center
+                                    justify-content-center me-3"
+                             style="width: 50px; height: 50px;">
+
+                            <i class="fas fa-users fa-lg"></i>
+
+                        </div>
+
+                        <div>
+                            <h5 class="fw-bold mb-1">
+                                Project Team
+                            </h5>
+
+                            <p class="text-muted mb-0">
+                                Select users who should have access
+                                to this project.
+                            </p>
+                        </div>
+
+                    </div>
+
+
+                    <!-- Form -->
+                    <form method="POST">
+
+                        {% csrf_token %}
+
+                        <div class="mb-4">
+
+                            <label class="form-label fw-semibold">
+                                Team Members
+                            </label>
+
+                            {{ form.members }}
+
+                            {% if form.members.errors %}
+
+                                <div class="text-danger small mt-2">
+                                    {{ form.members.errors }}
+                                </div>
+
+                            {% endif %}
+
+                            <div class="form-text mt-2">
+                                Hold <strong>Ctrl</strong> (Windows)
+                                or <strong>Command</strong> (Mac)
+                                to select multiple members.
+                            </div>
+
+                        </div>
+
+
+                        <!-- Buttons -->
+                        <div class="d-flex gap-2">
+
+                            <button type="submit"
+                                    class="btn btn-primary px-4">
+
+                                <i class="fas fa-save me-2"></i>
+                                Save Team Members
+
+                            </button>
+
+                            <a href="{% url 'project_detail' project.id %}"
+                               class="btn btn-outline-secondary px-4">
+
+                                Cancel
+
+                            </a>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Project Information -->
+        <div class="col-lg-4 mt-4 mt-lg-0">
+
+            <div class="card border-0 shadow-sm">
+
+                <div class="card-body p-4">
+
+                    <h5 class="fw-bold mb-3">
+                        <i class="fas fa-folder-open text-primary me-2"></i>
+                        Project Information
+                    </h5>
+
+                    <div class="mb-3">
+
+                        <small class="text-muted d-block">
+                            Project Name
+                        </small>
+
+                        <strong>
+                            {{ project.name }}
+                        </strong>
+
+                    </div>
+
+
+                    <div class="mb-3">
+
+                        <small class="text-muted d-block">
+                            Project Owner
+                        </small>
+
+                        <strong>
+                            {{ project.owner.username }}
+                        </strong>
+
+                    </div>
+
+
+                    <div>
+
+                        <small class="text-muted d-block">
+                            Current Members
+                        </small>
+
+                        <strong>
+                            {{ project.members.count }}
+                        </strong>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

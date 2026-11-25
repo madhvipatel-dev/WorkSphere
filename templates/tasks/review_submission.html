@@ -1,0 +1,705 @@
+
+{% extends "base.html" %}
+
+{% block title %}Review Submission | WorkSphere{% endblock %}
+
+{% block content %}
+<div class="page-content">
+    <div class="dashboard-page">
+
+        <!-- Page Header -->
+        <div class="dashboard-header">
+            <div>
+                <h1>Review Submission</h1>
+                <p>
+                    Review submitted work, provide feedback,
+                    and record your decision.
+                </p>
+            </div>
+
+            <div>
+                <a
+                    href="{% url 'manager_submissions' %}"
+                    class="btn btn-outline-secondary"
+                >
+                    <i class="fa-solid fa-arrow-left"></i>
+                    Back to Submissions
+                </a>
+            </div>
+        </div>
+
+        <!-- Submission Summary -->
+        <div class="dashboard-panel">
+            <div class="dashboard-section-title">
+                <div>
+                    <h2>{{ submission.task.title }}</h2>
+                    <p>Task and submission information</p>
+                </div>
+
+                <div>
+                    {% if submission.status == "pending" %}
+                        <span class="badge bg-warning text-dark">
+                            <i class="fa-solid fa-clock"></i>
+                            Pending Review
+                        </span>
+
+                    {% elif submission.status == "approved" %}
+                        <span class="badge bg-success">
+                            <i class="fa-solid fa-check-circle"></i>
+                            Approved
+                        </span>
+
+                    {% elif submission.status == "rejected" %}
+                        <span class="badge bg-danger">
+                            <i class="fa-solid fa-xmark"></i>
+                            Rejected
+                        </span>
+
+                    {% elif submission.status == "changes_requested" %}
+                        <span class="badge bg-info text-dark">
+                            <i class="fa-solid fa-rotate"></i>
+                            Changes Requested
+                        </span>
+
+                    {% else %}
+                        <span class="badge bg-secondary">
+                            {{ submission.get_status_display }}
+                        </span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="row g-4">
+
+                <!-- Task Details -->
+                <div class="col-lg-8">
+
+                    <h6 class="fw-semibold mb-3">
+                        <i class="fa-solid fa-list-check"></i>
+                        Task Information
+                    </h6>
+
+                    {% if submission.task.description %}
+                        <div class="mb-4">
+                            <small class="text-muted d-block mb-2">
+                                Description
+                            </small>
+
+                            <div class="submission-text">
+                                {{ submission.task.description }}
+                            </div>
+                        </div>
+                    {% endif %}
+
+                    <div class="row g-3">
+
+                        <div class="col-sm-6">
+                            <small class="text-muted d-block mb-1">
+                                Project
+                            </small>
+
+                            <strong>
+                                {{ submission.task.project.name }}
+                            </strong>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <small class="text-muted d-block mb-1">
+                                Task Status
+                            </small>
+
+                            <span class="badge bg-secondary">
+                                {{ submission.task.get_status_display }}
+                            </span>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <small class="text-muted d-block mb-1">
+                                Priority
+                            </small>
+
+                            {% if submission.task.priority == "urgent" %}
+                                <span class="badge bg-danger">
+                                    Urgent
+                                </span>
+
+                            {% elif submission.task.priority == "high" %}
+                                <span class="badge bg-warning text-dark">
+                                    High
+                                </span>
+
+                            {% elif submission.task.priority == "medium" %}
+                                <span class="badge bg-info text-dark">
+                                    Medium
+                                </span>
+
+                            {% else %}
+                                <span class="badge bg-secondary">
+                                    Low
+                                </span>
+                            {% endif %}
+                        </div>
+
+                        <div class="col-sm-6">
+                            <small class="text-muted d-block mb-1">
+                                Due Date
+                            </small>
+
+                            <strong>
+                                {% if submission.task.due_date %}
+                                    {{ submission.task.due_date|date:"d M Y" }}
+                                {% else %}
+                                    Not specified
+                                {% endif %}
+                            </strong>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Employee Information -->
+                <div class="col-lg-4">
+                    <div class="review-employee-card">
+
+                        <h6 class="fw-semibold mb-3">
+                            <i class="fa-solid fa-user"></i>
+                            Submitted By
+                        </h6>
+
+                        <div class="d-flex align-items-center gap-3 mb-4">
+
+                            <div class="review-avatar">
+                                {{ submission.submitted_by.username|first|upper }}
+                            </div>
+
+                            <div class="review-employee-name">
+                                <strong class="d-block">
+                                    {% if submission.submitted_by.get_full_name %}
+                                        {{ submission.submitted_by.get_full_name }}
+                                    {% else %}
+                                        {{ submission.submitted_by.username }}
+                                    {% endif %}
+                                </strong>
+
+                                <small class="text-muted">
+                                    {{ submission.submitted_by.username }}
+                                </small>
+                            </div>
+
+                        </div>
+
+                        <small class="text-muted d-block mb-1">
+                            Submitted On
+                        </small>
+
+                        <strong>
+                            {{ submission.submitted_at|date:"d M Y, h:i A" }}
+                        </strong>
+
+                        {% if submission.reviewed_at %}
+                            <hr>
+
+                            <small class="text-muted d-block mb-1">
+                                Reviewed On
+                            </small>
+
+                            <strong>
+                                {{ submission.reviewed_at|date:"d M Y, h:i A" }}
+                            </strong>
+                        {% endif %}
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Submitted Work -->
+        <div class="dashboard-panel mt-4">
+
+            <div class="dashboard-section-title">
+                <div>
+                    <h2>Submitted Work</h2>
+                    <p>
+                        Review the employee's work description
+                        and supporting attachment.
+                    </p>
+                </div>
+            </div>
+
+            <div class="review-content-card">
+
+                <h6 class="fw-semibold mb-3">
+                    <i class="fa-solid fa-file-lines"></i>
+                    Work Description
+                </h6>
+
+                <div class="submission-text">
+                    {{ submission.comment }}
+                </div>
+
+            </div>
+
+            <div class="mt-4">
+
+                <h6 class="fw-semibold mb-3">
+                    <i class="fa-solid fa-paperclip"></i>
+                    Attached Work
+                </h6>
+
+                {% if submission.attachment %}
+
+                    <div class="review-attachment-card">
+
+                        <div class="d-flex align-items-center gap-3">
+
+                            <div class="review-file-icon">
+                                <i class="fa-solid fa-file"></i>
+                            </div>
+
+                            <div class="review-file-details">
+
+                                <strong class="d-block">
+                                    {{ submission.attachment.name|cut:"task_submissions/" }}
+                                </strong>
+
+                                <small class="text-muted">
+                                    Employee attachment
+                                </small>
+
+                            </div>
+                        </div>
+
+                        <a
+                            href="{{ submission.attachment.url }}"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="btn btn-outline-primary"
+                        >
+                            <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                            View Attachment
+                        </a>
+
+                    </div>
+
+                {% else %}
+
+                    <div class="alert alert-light border mb-0">
+                        <i class="fa-solid fa-circle-info"></i>
+                        No attachment was included with this submission.
+                    </div>
+
+                {% endif %}
+
+            </div>
+        </div>
+
+        <!-- Manager Review -->
+        <div class="dashboard-panel mt-4">
+
+            <div class="dashboard-section-title">
+                <div>
+                    <h2>Manager Review</h2>
+
+                    {% if submission.status == "pending" %}
+                        <p>
+                            Choose a review decision and provide
+                            feedback to the employee.
+                        </p>
+                    {% else %}
+                        <p>
+                            This submission has been reviewed.
+                            The recorded decision is read-only.
+                        </p>
+                    {% endif %}
+                </div>
+            </div>
+
+            {% if submission.status == "pending" %}
+
+                <form
+                    method="post"
+                    id="submissionReviewForm"
+                    action="{% url 'review_submission' submission.id %}"
+                >
+                    {% csrf_token %}
+
+                    <div class="mb-4">
+
+                        <label
+                            for="manager_feedback"
+                            class="form-label fw-semibold"
+                        >
+                            <i class="fa-solid fa-comment-dots"></i>
+                            Manager Feedback
+                        </label>
+
+                        <textarea
+                            name="manager_feedback"
+                            id="manager_feedback"
+                            class="form-control"
+                            rows="6"
+                            maxlength="5000"
+                            placeholder="Describe what was done well or what needs improvement..."
+                        ></textarea>
+
+                        <div class="form-text">
+                            Feedback is optional when approving work.
+                            Feedback is required when rejecting work
+                            or requesting changes.
+                        </div>
+
+                    </div>
+
+                    <div class="alert alert-info">
+
+                        <div class="fw-semibold mb-2">
+                            <i class="fa-solid fa-circle-info"></i>
+                            Review Guidelines
+                        </div>
+
+                        <p class="mb-0">
+                            <strong>Approve:</strong>
+                            The submitted work meets the task requirements.
+                            <br>
+                            <strong>Reject:</strong>
+                            The submitted work is not acceptable.
+                            <br>
+                            <strong>Request Changes:</strong>
+                            The employee should revise and resubmit the work.
+                        </p>
+
+                    </div>
+
+                    <div
+                        id="reviewValidationMessage"
+                        class="alert alert-danger d-none"
+                        role="alert"
+                    ></div>
+
+                    <div class="review-actions">
+
+                        <button
+                            type="submit"
+                            name="action"
+                            value="changes_requested"
+                            class="btn btn-info review-action-btn"
+                        >
+                            <i class="fa-solid fa-rotate"></i>
+                            Request Changes
+                        </button>
+
+                        <button
+                            type="submit"
+                            name="action"
+                            value="rejected"
+                            class="btn btn-danger review-action-btn"
+                        >
+                            <i class="fa-solid fa-xmark"></i>
+                            Reject
+                        </button>
+
+                        <button
+                            type="submit"
+                            name="action"
+                            value="approved"
+                            class="btn btn-success review-action-btn"
+                        >
+                            <i class="fa-solid fa-check"></i>
+                            Approve
+                        </button>
+
+                    </div>
+
+                </form>
+
+            {% else %}
+
+                <div class="alert alert-secondary">
+
+                    <i class="fa-solid fa-circle-check"></i>
+
+                    This submission has already been reviewed.
+                    The review decision cannot be changed.
+
+                </div>
+
+                <div class="review-result-card">
+
+                    <h6 class="fw-semibold mb-3">
+                        Review Decision
+                    </h6>
+
+                    {% if submission.status == "approved" %}
+                        <span class="badge bg-success">
+                            <i class="fa-solid fa-check-circle"></i>
+                            Approved
+                        </span>
+
+                    {% elif submission.status == "rejected" %}
+                        <span class="badge bg-danger">
+                            <i class="fa-solid fa-xmark"></i>
+                            Rejected
+                        </span>
+
+                    {% elif submission.status == "changes_requested" %}
+                        <span class="badge bg-info text-dark">
+                            <i class="fa-solid fa-rotate"></i>
+                            Changes Requested
+                        </span>
+
+                    {% else %}
+                        <span class="badge bg-secondary">
+                            {{ submission.get_status_display }}
+                        </span>
+                    {% endif %}
+
+                    {% if submission.manager_feedback %}
+
+                        <hr>
+
+                        <h6 class="fw-semibold mb-2">
+                            <i class="fa-solid fa-comment"></i>
+                            Manager Feedback
+                        </h6>
+
+                        <div class="submission-text">
+                            {{ submission.manager_feedback }}
+                        </div>
+
+                    {% else %}
+
+                        <p class="text-muted mt-3 mb-0">
+                            No additional feedback was provided.
+                        </p>
+
+                    {% endif %}
+
+                    {% if submission.reviewed_at %}
+
+                        <div class="mt-3">
+                            <small class="text-muted">
+                                Reviewed on
+                                {{ submission.reviewed_at|date:"d M Y, h:i A" }}
+                            </small>
+                        </div>
+
+                    {% endif %}
+
+                </div>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+</div>
+
+<style>
+    .submission-text {
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+        line-height: 1.7;
+    }
+
+    .review-employee-card {
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 22px;
+        height: 100%;
+    }
+
+    .review-avatar {
+        width: 46px;
+        height: 46px;
+        min-width: 46px;
+        border-radius: 50%;
+        background: #0d6efd;
+        color: #ffffff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        font-weight: 700;
+    }
+
+    .review-employee-name {
+        min-width: 0;
+        overflow-wrap: anywhere;
+    }
+
+    .review-content-card {
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 24px;
+    }
+
+    .review-attachment-card {
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 18px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 18px;
+    }
+
+    .review-file-icon {
+        width: 48px;
+        height: 48px;
+        min-width: 48px;
+        background: #f1f5f9;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        color: #475569;
+    }
+
+    .review-file-details {
+        min-width: 0;
+        overflow-wrap: anywhere;
+    }
+
+    .review-result-card {
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 24px;
+    }
+
+    .review-actions {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 18px;
+        width: 100%;
+        margin: 28px auto 8px;
+        padding: 8px 0;
+    }
+
+    .review-action-btn {
+        min-width: 210px;
+        min-height: 56px;
+        padding: 15px 26px;
+        font-size: 16px;
+        font-weight: 600;
+        border-radius: 9px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        transition:
+            transform 0.2s ease,
+            box-shadow 0.2s ease;
+    }
+
+    .review-action-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .review-action-btn:focus-visible {
+        outline: 3px solid rgba(13, 110, 253, 0.35);
+        outline-offset: 3px;
+    }
+
+    @media (max-width: 600px) {
+        .review-actions {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 12px;
+        }
+
+        .review-action-btn {
+            width: 100%;
+            min-width: 0;
+        }
+
+        .review-content-card,
+        .review-result-card,
+        .review-employee-card {
+            padding: 16px;
+        }
+
+        .review-attachment-card {
+            align-items: stretch;
+        }
+
+        .review-attachment-card .btn {
+            width: 100%;
+        }
+    }
+</style>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const form = document.getElementById("submissionReviewForm");
+
+    if (!form) {
+        return;
+    }
+
+    const feedbackInput = document.getElementById("manager_feedback");
+    const validationMessage = document.getElementById(
+        "reviewValidationMessage"
+    );
+
+    form.addEventListener("submit", function (event) {
+        const submitButton = event.submitter;
+
+        if (!submitButton) {
+            event.preventDefault();
+            return;
+        }
+
+        const action = submitButton.value;
+        const feedback = feedbackInput.value.trim();
+
+        validationMessage.classList.add("d-none");
+        validationMessage.textContent = "";
+
+        if (
+            (action === "rejected" || action === "changes_requested")
+            && !feedback
+        ) {
+            event.preventDefault();
+
+            validationMessage.textContent =
+                "Please provide feedback before rejecting work " +
+                "or requesting changes.";
+
+            validationMessage.classList.remove("d-none");
+
+            feedbackInput.focus();
+            return;
+        }
+
+        const actionLabels = {
+            approved: "approve",
+            rejected: "reject",
+            changes_requested: "request changes to"
+        };
+
+        const actionLabel = actionLabels[action];
+
+        if (!actionLabel) {
+            event.preventDefault();
+            return;
+        }
+
+        const confirmed = window.confirm(
+            "Are you sure you want to " +
+            actionLabel +
+            " this submission? This decision cannot be changed."
+        );
+
+        if (!confirmed) {
+            event.preventDefault();
+        }
+    });
+});
+</script>
+{% endblock %}

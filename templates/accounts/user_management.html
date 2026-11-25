@@ -1,0 +1,1028 @@
+{% extends "base.html" %}
+
+{% block title %}
+    User Management | WorkSphere
+{% endblock %}
+
+
+{% block content %}
+
+<div class="container-fluid">
+
+
+    <!-- =====================================================
+         PAGE HEADER
+         ===================================================== -->
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <div>
+
+            <div class="text-uppercase small fw-bold text-primary mb-2">
+                Administration
+            </div>
+
+            <h2 class="fw-bold mb-1">
+                User Management
+            </h2>
+
+            <p class="text-muted mb-0">
+                Manage users, roles and account status across WorkSphere.
+            </p>
+
+        </div>
+
+
+        <div>
+
+            <span class="badge bg-dark px-3 py-2">
+
+                <i class="fa-solid fa-shield-halved me-1"></i>
+
+                Administrator
+
+            </span>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- =====================================================
+         USER STATISTICS
+         ===================================================== -->
+
+    <div class="row g-3 mb-4">
+
+
+        <!-- Total Users -->
+
+        <div class="col-xl-3 col-md-6">
+
+            <div class="card border-0 shadow-sm h-100">
+
+                <div class="card-body">
+
+                    <div class="d-flex justify-content-between align-items-start">
+
+                        <div>
+
+                            <small class="text-muted">
+                                Total Users
+                            </small>
+
+                            <h3 class="fw-bold mt-2 mb-1">
+                                {{ total_users }}
+                            </h3>
+
+                            <small class="text-muted">
+                                Registered accounts
+                            </small>
+
+                        </div>
+
+
+                        <div
+                            class="rounded-3 bg-primary-subtle text-primary
+                                   d-flex align-items-center
+                                   justify-content-center"
+                            style="width:48px;height:48px;"
+                        >
+
+                            <i class="fa-solid fa-users fa-lg"></i>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- Active Users -->
+
+        <div class="col-xl-3 col-md-6">
+
+            <div class="card border-0 shadow-sm h-100">
+
+                <div class="card-body">
+
+                    <div class="d-flex justify-content-between align-items-start">
+
+                        <div>
+
+                            <small class="text-muted">
+                                Active Users
+                            </small>
+
+                            <h3 class="fw-bold mt-2 mb-1">
+                                {{ active_users }}
+                            </h3>
+
+                            <small class="text-success">
+                                <i class="fa-solid fa-circle-check me-1"></i>
+                                Active accounts
+                            </small>
+
+                        </div>
+
+
+                        <div
+                            class="rounded-3 bg-success-subtle text-success
+                                   d-flex align-items-center
+                                   justify-content-center"
+                            style="width:48px;height:48px;"
+                        >
+
+                            <i class="fa-solid fa-user-check fa-lg"></i>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- Managers -->
+
+        <div class="col-xl-3 col-md-6">
+
+            <div class="card border-0 shadow-sm h-100">
+
+                <div class="card-body">
+
+                    <div class="d-flex justify-content-between align-items-start">
+
+                        <div>
+
+                            <small class="text-muted">
+                                Managers
+                            </small>
+
+                            <h3 class="fw-bold mt-2 mb-1">
+                                {{ manager_users }}
+                            </h3>
+
+                            <small class="text-muted">
+                                Management accounts
+                            </small>
+
+                        </div>
+
+
+                        <div
+                            class="rounded-3 bg-warning-subtle text-warning
+                                   d-flex align-items-center
+                                   justify-content-center"
+                            style="width:48px;height:48px;"
+                        >
+
+                            <i class="fa-solid fa-user-tie fa-lg"></i>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- Employees -->
+
+        <div class="col-xl-3 col-md-6">
+
+            <div class="card border-0 shadow-sm h-100">
+
+                <div class="card-body">
+
+                    <div class="d-flex justify-content-between align-items-start">
+
+                        <div>
+
+                            <small class="text-muted">
+                                Employees
+                            </small>
+
+                            <h3 class="fw-bold mt-2 mb-1">
+                                {{ employee_users }}
+                            </h3>
+
+                            <small class="text-muted">
+                                Employee accounts
+                            </small>
+
+                        </div>
+
+
+                        <div
+                            class="rounded-3 bg-info-subtle text-info
+                                   d-flex align-items-center
+                                   justify-content-center"
+                            style="width:48px;height:48px;"
+                        >
+
+                            <i class="fa-solid fa-user fa-lg"></i>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- =====================================================
+         SEARCH AND FILTERS
+         ===================================================== -->
+
+    <div class="card border-0 shadow-sm mb-4">
+
+        <div class="card-body">
+
+            <form method="get">
+
+                <div class="row g-3 align-items-end">
+
+
+                    <!-- Search -->
+
+                    <div class="col-lg-5">
+
+                        <label class="form-label fw-semibold">
+                            Search Users
+                        </label>
+
+                        <div class="input-group">
+
+                            <span class="input-group-text bg-white">
+
+                                <i class="fa-solid fa-magnifying-glass
+                                          text-muted">
+                                </i>
+
+                            </span>
+
+                            <input
+                                type="text"
+                                name="search"
+                                value="{{ search_query }}"
+                                class="form-control"
+                                placeholder="Username, email, department..."
+                            >
+
+                        </div>
+
+                    </div>
+
+
+
+                    <!-- Role -->
+
+                    <div class="col-lg-2 col-md-4">
+
+                        <label class="form-label fw-semibold">
+                            Role
+                        </label>
+
+                        <select
+                            name="role"
+                            class="form-select"
+                        >
+
+                            <option value="">
+                                All Roles
+                            </option>
+
+                            <option
+                                value="admin"
+                                {% if role_filter == "admin" %}selected{% endif %}
+                            >
+                                Admin
+                            </option>
+
+                            <option
+                                value="manager"
+                                {% if role_filter == "manager" %}selected{% endif %}
+                            >
+                                Manager
+                            </option>
+
+                            <option
+                                value="employee"
+                                {% if role_filter == "employee" %}selected{% endif %}
+                            >
+                                Employee
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+
+                    <!-- Status -->
+
+                    <div class="col-lg-2 col-md-4">
+
+                        <label class="form-label fw-semibold">
+                            Status
+                        </label>
+
+                        <select
+                            name="status"
+                            class="form-select"
+                        >
+
+                            <option value="">
+                                All Status
+                            </option>
+
+                            <option
+                                value="active"
+                                {% if status_filter == "active" %}selected{% endif %}
+                            >
+                                Active
+                            </option>
+
+                            <option
+                                value="inactive"
+                                {% if status_filter == "inactive" %}selected{% endif %}
+                            >
+                                Inactive
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+
+                    <!-- Buttons -->
+
+                    <div class="col-lg-3 col-md-4">
+
+                        <div class="d-flex gap-2">
+
+                            <button
+                                type="submit"
+                                class="btn btn-primary flex-grow-1"
+                            >
+
+                                <i class="fa-solid fa-filter me-1"></i>
+
+                                Apply
+
+                            </button>
+
+
+                            <a
+                                href="{% url 'user_management' %}"
+                                class="btn btn-outline-secondary"
+                                title="Clear filters"
+                            >
+
+                                <i class="fa-solid fa-rotate-left"></i>
+
+                            </a>
+
+                        </div>
+
+                    </div>
+
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- =====================================================
+         USER TABLE
+         ===================================================== -->
+
+    <div class="card border-0 shadow-sm">
+
+        <div class="card-body p-0">
+
+
+            <!-- Table Header -->
+
+            <div class="p-4 border-bottom">
+
+                <div class="d-flex justify-content-between align-items-center">
+
+                    <div>
+
+                        <h5 class="fw-bold mb-1">
+                            System Users
+                        </h5>
+
+                        <small class="text-muted">
+                            Manage WorkSphere accounts and permissions.
+                        </small>
+
+                    </div>
+
+
+                    <span class="text-muted small">
+
+                        {{ users|length }} result{{ users|length|pluralize }}
+
+                    </span>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- Table -->
+
+            <div class="table-responsive">
+
+                <table class="table table-hover align-middle mb-0">
+
+                    <thead class="table-light">
+
+                        <tr>
+
+                            <th class="px-4">
+                                User
+                            </th>
+
+                            <th>
+                                Email
+                            </th>
+
+                            <th>
+                                Department
+                            </th>
+
+                            <th>
+                                Job Title
+                            </th>
+
+                            <th>
+                                Role
+                            </th>
+
+                            <th>
+                                Status
+                            </th>
+
+                            <th class="text-center">
+                                Action
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+
+                        {% for user in users %}
+
+
+                        <tr>
+
+
+                            <!-- User -->
+
+                            <td class="px-4">
+
+                                <div class="d-flex align-items-center">
+
+
+                                    <div
+                                        class="rounded-circle bg-primary text-white
+                                               d-flex align-items-center
+                                               justify-content-center me-3"
+                                        style="
+                                            width:42px;
+                                            height:42px;
+                                            font-weight:600;
+                                        "
+                                    >
+
+                                        {{ user.username|first|upper }}
+
+                                    </div>
+
+
+                                    <div>
+
+                                        <div class="fw-semibold">
+
+                                            {{ user.username }}
+
+
+                                            {% if user == request.user %}
+
+                                                <span class="badge bg-success ms-1">
+                                                    You
+                                                </span>
+
+                                            {% endif %}
+
+                                        </div>
+
+
+                                        <small class="text-muted">
+
+                                            Joined
+                                            {{ user.date_joined|date:"d M Y" }}
+
+                                        </small>
+
+                                    </div>
+
+                                </div>
+
+                            </td>
+
+
+
+                            <!-- Email -->
+
+                            <td>
+
+                                {% if user.email %}
+
+                                    <span>
+                                        {{ user.email }}
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="text-muted">
+                                        Not provided
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+
+
+                            <!-- Department -->
+
+                            <td>
+
+                                {% if user.profile.department %}
+
+                                    {{ user.profile.department }}
+
+                                {% else %}
+
+                                    <span class="text-muted">
+                                        Not assigned
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+
+
+                            <!-- Job Title -->
+
+                            <td>
+
+                                {% if user.profile.job_title %}
+
+                                    {{ user.profile.job_title }}
+
+                                {% else %}
+
+                                    <span class="text-muted">
+                                        Not assigned
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+
+
+                            <!-- Role -->
+
+                            <td>
+
+
+                                {% if user.profile.role == "admin" %}
+
+                                    <span
+                                        class="badge bg-danger-subtle
+                                               text-danger px-3 py-2"
+                                    >
+
+                                        <i class="fa-solid fa-shield-halved me-1"></i>
+
+                                        Admin
+
+                                    </span>
+
+
+                                {% elif user.profile.role == "manager" %}
+
+                                    <span
+                                        class="badge bg-warning-subtle
+                                               text-warning-emphasis px-3 py-2"
+                                    >
+
+                                        <i class="fa-solid fa-user-tie me-1"></i>
+
+                                        Manager
+
+                                    </span>
+
+
+                                {% else %}
+
+                                    <span
+                                        class="badge bg-primary-subtle
+                                               text-primary px-3 py-2"
+                                    >
+
+                                        <i class="fa-solid fa-user me-1"></i>
+
+                                        Employee
+
+                                    </span>
+
+                                {% endif %}
+
+
+                            </td>
+
+
+
+                            <!-- Status -->
+
+                            <td>
+
+
+                                {% if user.is_active %}
+
+                                    <span class="text-success small">
+
+                                        <i class="fa-solid fa-circle
+                                                  me-1"
+                                           style="font-size:8px;">
+                                        </i>
+
+                                        Active
+
+                                    </span>
+
+
+                                {% else %}
+
+                                    <span class="text-danger small">
+
+                                        <i class="fa-solid fa-circle
+                                                  me-1"
+                                           style="font-size:8px;">
+                                        </i>
+
+                                        Inactive
+
+                                    </span>
+
+                                {% endif %}
+
+
+                            </td>
+
+
+
+                            <!-- Action -->
+
+                            <td class="text-center">
+
+
+                                {% if user == request.user %}
+
+
+                                    <span class="text-muted small">
+
+                                        <i class="fa-solid fa-lock me-1"></i>
+
+                                        Protected
+
+                                    </span>
+
+
+                                {% else %}
+
+
+                                    <form
+                                        method="post"
+                                        action="{% url 'update_user_role' user.id %}"
+                                        class="d-flex justify-content-center
+                                               align-items-center gap-2"
+                                    >
+
+                                        {% csrf_token %}
+
+
+                                        <select
+                                            name="role"
+                                            class="form-select form-select-sm"
+                                            style="min-width:120px;"
+                                        >
+
+                                            <option
+                                                value="employee"
+                                                {% if user.profile.role == "employee" %}selected{% endif %}
+                                            >
+                                                Employee
+                                            </option>
+
+
+                                            <option
+                                                value="manager"
+                                                {% if user.profile.role == "manager" %}selected{% endif %}
+                                            >
+                                                Manager
+                                            </option>
+
+
+                                            <option
+                                                value="admin"
+                                                {% if user.profile.role == "admin" %}selected{% endif %}
+                                            >
+                                                Admin
+                                            </option>
+
+                                        </select>
+
+
+                                        <button
+                                            type="submit"
+                                            class="btn btn-sm btn-primary"
+                                            title="Update role"
+                                        >
+
+                                            <i class="fa-solid fa-check"></i>
+
+                                        </button>
+
+
+                                    </form>
+
+
+                                {% endif %}
+
+
+                            </td>
+
+
+                        </tr>
+
+
+                        {% empty %}
+
+
+                        <tr>
+
+                            <td
+                                colspan="7"
+                                class="text-center py-5"
+                            >
+
+                                <div class="text-muted">
+
+
+                                    <i
+                                        class="fa-solid fa-users-slash fa-2x mb-3"
+                                    ></i>
+
+
+                                    <h6 class="fw-bold">
+                                        No users found
+                                    </h6>
+
+
+                                    <p class="mb-0 small">
+                                        Try changing your search or filters.
+                                    </p>
+
+
+                                </div>
+
+                            </td>
+
+                        </tr>
+
+
+                        {% endfor %}
+
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+
+
+    <!-- =====================================================
+         ROLE INFORMATION
+         ===================================================== -->
+
+    <div class="row g-3 mt-4 mb-3">
+
+
+        <!-- Employee -->
+
+        <div class="col-lg-4">
+
+            <div class="card border-0 shadow-sm h-100">
+
+                <div class="card-body">
+
+                    <div class="d-flex align-items-center mb-3">
+
+                        <div
+                            class="rounded-3 bg-primary-subtle text-primary
+                                   d-flex align-items-center
+                                   justify-content-center me-3"
+                            style="width:42px;height:42px;"
+                        >
+
+                            <i class="fa-solid fa-user"></i>
+
+                        </div>
+
+
+                        <div>
+
+                            <h6 class="fw-bold mb-0">
+                                Employee
+                            </h6>
+
+                            <small class="text-muted">
+                                {{ employee_users }} user{{ employee_users|pluralize }}
+                            </small>
+
+                        </div>
+
+                    </div>
+
+
+                    <p class="text-muted small mb-0">
+
+                        Employees can manage assigned tasks,
+                        meetings, project files and their daily work.
+
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- Manager -->
+
+        <div class="col-lg-4">
+
+            <div class="card border-0 shadow-sm h-100">
+
+                <div class="card-body">
+
+                    <div class="d-flex align-items-center mb-3">
+
+                        <div
+                            class="rounded-3 bg-warning-subtle text-warning
+                                   d-flex align-items-center
+                                   justify-content-center me-3"
+                            style="width:42px;height:42px;"
+                        >
+
+                            <i class="fa-solid fa-user-tie"></i>
+
+                        </div>
+
+
+                        <div>
+
+                            <h6 class="fw-bold mb-0">
+                                Manager
+                            </h6>
+
+                            <small class="text-muted">
+                                {{ manager_users }} user{{ manager_users|pluralize }}
+                            </small>
+
+                        </div>
+
+                    </div>
+
+
+                    <p class="text-muted small mb-0">
+
+                        Managers can manage projects,
+                        assign tasks and monitor team progress.
+
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- Admin -->
+
+        <div class="col-lg-4">
+
+            <div class="card border-0 shadow-sm h-100">
+
+                <div class="card-body">
+
+                    <div class="d-flex align-items-center mb-3">
+
+                        <div
+                            class="rounded-3 bg-danger-subtle text-danger
+                                   d-flex align-items-center
+                                   justify-content-center me-3"
+                            style="width:42px;height:42px;"
+                        >
+
+                            <i class="fa-solid fa-shield-halved"></i>
+
+                        </div>
+
+
+                        <div>
+
+                            <h6 class="fw-bold mb-0">
+                                Administrator
+                            </h6>
+
+                            <small class="text-muted">
+                                {{ admin_users }} user{{ admin_users|pluralize }}
+                            </small>
+
+                        </div>
+
+                    </div>
+
+
+                    <p class="text-muted small mb-0">
+
+                        Administrators manage users,
+                        roles, permissions and system-level operations.
+
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+
+</div>
+
+{% endblock %}

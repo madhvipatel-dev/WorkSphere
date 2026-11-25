@@ -1,0 +1,390 @@
+
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container-fluid py-4">
+
+    <!-- PROJECT HEADER -->
+    <div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-4">
+
+        <div>
+            <a href="{% url 'project_list' %}"
+               class="text-decoration-none text-muted">
+                <i class="fas fa-arrow-left me-2"></i>
+                Back to Projects
+            </a>
+
+            <h1 class="fw-bold mt-3 mb-2">
+                {{ project.name }}
+            </h1>
+
+            <p class="text-muted mb-0">
+                Project details, team information and verified progress.
+            </p>
+        </div>
+
+        <!-- ADMIN / MANAGER ACTIONS -->
+        {% if can_manage_project %}
+        <div class="d-flex flex-wrap gap-2 mt-3">
+
+            <a href="{% url 'project_edit' project.id %}"
+               class="btn btn-primary">
+                <i class="fas fa-edit me-2"></i>
+                Edit Project
+            </a>
+
+            <a href="{% url 'project_members' project.id %}"
+               class="btn btn-outline-primary">
+                <i class="fas fa-users me-2"></i>
+                Manage Team
+            </a>
+
+            <a href="{% url 'project_delete' project.id %}"
+               class="btn btn-outline-danger">
+                <i class="fas fa-trash-alt me-2"></i>
+                Delete Project
+            </a>
+
+        </div>
+        {% endif %}
+
+    </div>
+
+    <!-- PROJECT STATISTICS -->
+    <div class="row g-3 mb-4">
+
+        <div class="col-md-3 col-sm-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <p class="text-muted small mb-2">
+                        Total Tasks
+                    </p>
+                    <h3 class="fw-bold mb-0">
+                        {{ task_count }}
+                    </h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 col-sm-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <p class="text-muted small mb-2">
+                        Approved Tasks
+                    </p>
+                    <h3 class="fw-bold text-success mb-0">
+                        {{ approved_tasks }}
+                    </h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 col-sm-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <p class="text-muted small mb-2">
+                        Pending Review
+                    </p>
+                    <h3 class="fw-bold text-warning mb-0">
+                        {{ pending_review_tasks }}
+                    </h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 col-sm-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <p class="text-muted small mb-2">
+                        Verified Progress
+                    </p>
+                    <h3 class="fw-bold text-primary mb-0">
+                        {{ dashboard_progress }}%
+                    </h3>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="row g-4">
+
+        <!-- LEFT COLUMN -->
+        <div class="col-lg-8">
+
+            <!-- PROJECT INFORMATION -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body p-4">
+
+                    <h5 class="fw-bold mb-4">
+                        <i class="fas fa-folder-open text-primary me-2"></i>
+                        Project Information
+                    </h5>
+
+                    <div class="row g-4">
+
+                        <div class="col-md-6">
+                            <p class="text-muted small mb-1">
+                                Project Name
+                            </p>
+                            <p class="fw-semibold mb-0">
+                                {{ project.name }}
+                            </p>
+                        </div>
+
+                        <div class="col-md-6">
+                            <p class="text-muted small mb-1">
+                                Project Status
+                            </p>
+                            <span class="badge bg-primary">
+                                {{ project.get_status_display }}
+                            </span>
+                        </div>
+
+                        <div class="col-md-6">
+                            <p class="text-muted small mb-1">
+                                Start Date
+                            </p>
+                            <p class="fw-semibold mb-0">
+                                {{ project.start_date|date:"d M Y"|default:"Not set" }}
+                            </p>
+                        </div>
+
+                        <div class="col-md-6">
+                            <p class="text-muted small mb-1">
+                                Deadline
+                            </p>
+                            <p class="fw-semibold mb-0">
+                                {{ project.deadline|date:"d M Y"|default:"Not set" }}
+                            </p>
+                        </div>
+
+                        <div class="col-12">
+                            <p class="text-muted small mb-1">
+                                Description
+                            </p>
+                            <p class="mb-0">
+                                {{ project.description|default:"No description provided."|linebreaksbr }}
+                            </p>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- VERIFIED PROJECT PROGRESS -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body p-4">
+
+                    <h5 class="fw-bold mb-3">
+                        <i class="fas fa-chart-line text-primary me-2"></i>
+                        Project Progress
+                    </h5>
+
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">
+                            Verified Completion
+                        </span>
+                        <strong>
+                            {{ dashboard_progress }}%
+                        </strong>
+                    </div>
+
+                    <div class="progress mb-3"
+                         style="height: 12px;">
+                        <div class="progress-bar bg-success"
+                             role="progressbar"
+                             style="width: {{ dashboard_progress }}%;"
+                             aria-valuenow="{{ dashboard_progress }}"
+                             aria-valuemin="0"
+                             aria-valuemax="100">
+                        </div>
+                    </div>
+
+                    <p class="text-muted small mb-0">
+                        Progress is calculated from approved task submissions.
+                        Tasks awaiting approval are not counted as verified completion.
+                    </p>
+
+                </div>
+            </div>
+
+            <!-- PROJECT TASKS -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+
+                    <h5 class="fw-bold mb-4">
+                        <i class="fas fa-tasks text-primary me-2"></i>
+                        Project Tasks
+                    </h5>
+
+                    {% if tasks %}
+
+                        <div class="table-responsive">
+                            <table class="table align-middle">
+
+                                <thead>
+                                    <tr>
+                                        <th>Task</th>
+                                        <th>Assigned To</th>
+                                        <th>Status</th>
+                                        <th>Review</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                    {% for task in tasks %}
+                                    <tr>
+                                        <td>
+                                            <span class="fw-semibold">
+                                                {{ task.title }}
+                                            </span>
+                                        </td>
+
+                                        <td>
+                                            {% if task.assigned_to %}
+                                                {{ task.assigned_to.username }}
+                                            {% else %}
+                                                Unassigned
+                                            {% endif %}
+                                        </td>
+
+                                        <td>
+                                            <span class="badge bg-secondary">
+                                                {{ task.get_status_display }}
+                                            </span>
+                                        </td>
+
+                                        <td>
+                                            {% if task.latest_review_status %}
+                                                <span class="badge bg-info text-dark">
+                                                    {{ task.latest_review_status|title }}
+                                                </span>
+                                            {% else %}
+                                                <span class="text-muted small">
+                                                    Not reviewed
+                                                </span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+
+                            </table>
+                        </div>
+
+                    {% else %}
+
+                        <div class="text-center py-4">
+                            <i class="fas fa-clipboard-list fa-2x text-muted mb-3"></i>
+                            <p class="text-muted mb-0">
+                                No tasks have been added to this project.
+                            </p>
+                        </div>
+
+                    {% endif %}
+
+                </div>
+            </div>
+
+        </div>
+
+        <!-- RIGHT COLUMN -->
+        <div class="col-lg-4">
+
+            <!-- PROJECT OWNER -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body p-4">
+
+                    <h5 class="fw-bold mb-3">
+                        <i class="fas fa-user-shield text-primary me-2"></i>
+                        Project Owner
+                    </h5>
+
+                    <p class="fw-semibold mb-1">
+                        {{ project.owner.username }}
+                    </p>
+
+                    <p class="text-muted small mb-0">
+                        Project administrator / manager
+                    </p>
+
+                </div>
+            </div>
+
+            <!-- ASSIGNED CLIENT -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body p-4">
+
+                    <h5 class="fw-bold mb-3">
+                        <i class="fas fa-user-tie text-primary me-2"></i>
+                        Assigned Client
+                    </h5>
+
+                    {% if project.client %}
+                        <p class="fw-semibold mb-1">
+                            {{ project.client.username }}
+                        </p>
+                        <p class="text-muted small mb-0">
+                            Read-only project access
+                        </p>
+                    {% else %}
+                        <p class="text-muted mb-0">
+                            No Client assigned.
+                        </p>
+                    {% endif %}
+
+                </div>
+            </div>
+
+            <!-- PROJECT TEAM -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="fw-bold mb-0">
+                            <i class="fas fa-users text-primary me-2"></i>
+                            Project Team
+                        </h5>
+
+                        {% if can_manage_project %}
+                        <a href="{% url 'project_members' project.id %}"
+                           class="btn btn-sm btn-outline-primary">
+                            Manage
+                        </a>
+                        {% endif %}
+                    </div>
+
+                    {% for member in project.members.all %}
+
+                        <div class="d-flex align-items-center py-2 border-bottom">
+                            <div class="rounded-circle bg-light text-primary d-flex align-items-center justify-content-center me-3"
+                                 style="width: 36px; height: 36px;">
+                                <i class="fas fa-user"></i>
+                            </div>
+
+                            <span>
+                                {{ member.username }}
+                            </span>
+                        </div>
+
+                    {% empty %}
+
+                        <p class="text-muted mb-0">
+                            No team members assigned.
+                        </p>
+
+                    {% endfor %}
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

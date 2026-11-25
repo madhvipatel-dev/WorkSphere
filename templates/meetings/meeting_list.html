@@ -1,0 +1,901 @@
+
+{% extends "base.html" %}
+
+{% block title %}Meetings | WorkSphere{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid py-4">
+
+    <!-- ================================================== -->
+    <!-- PAGE HEADER -->
+    <!-- ================================================== -->
+
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+
+        <div>
+
+            <h2 class="fw-bold mb-1">
+
+                <i class="fa-solid fa-calendar-days text-primary me-2"></i>
+                Meeting Management
+
+            </h2>
+
+            <p class="text-muted mb-0">
+                View, schedule, and manage project meetings.
+            </p>
+
+        </div>
+
+        {% if can_create_meeting %}
+
+        <a href="{% url 'meeting_create' %}"
+           class="btn btn-primary">
+
+            <i class="fa-solid fa-plus me-2"></i>
+            New Meeting
+
+        </a>
+
+        {% endif %}
+
+    </div>
+
+
+    <!-- ================================================== -->
+    <!-- MEETING STATISTICS -->
+    <!-- ================================================== -->
+
+    <div class="row g-3 mb-4">
+
+        <!-- TOTAL MEETINGS -->
+
+        <div class="col-md-6 col-xl-3">
+
+            <div class="card border-0 shadow-sm h-100">
+
+                <div class="card-body p-4">
+
+                    <div class="d-flex justify-content-between align-items-center">
+
+                        <div>
+
+                            <small class="text-muted">
+                                Total Meetings
+                            </small>
+
+                            <h3 class="fw-bold mb-0 mt-1">
+                                {{ total_meetings }}
+                            </h3>
+
+                        </div>
+
+                        <div class="bg-primary bg-opacity-10 text-primary rounded-3 p-3">
+
+                            <i class="fa-solid fa-calendar-days fa-lg"></i>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- SCHEDULED -->
+
+        <div class="col-md-6 col-xl-3">
+
+            <div class="card border-0 shadow-sm h-100">
+
+                <div class="card-body p-4">
+
+                    <div class="d-flex justify-content-between align-items-center">
+
+                        <div>
+
+                            <small class="text-muted">
+                                Scheduled
+                            </small>
+
+                            <h3 class="fw-bold mb-0 mt-1">
+                                {{ scheduled_meetings }}
+                            </h3>
+
+                        </div>
+
+                        <div class="bg-info bg-opacity-10 text-info rounded-3 p-3">
+
+                            <i class="fa-solid fa-clock fa-lg"></i>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- COMPLETED -->
+
+        <div class="col-md-6 col-xl-3">
+
+            <div class="card border-0 shadow-sm h-100">
+
+                <div class="card-body p-4">
+
+                    <div class="d-flex justify-content-between align-items-center">
+
+                        <div>
+
+                            <small class="text-muted">
+                                Completed
+                            </small>
+
+                            <h3 class="fw-bold mb-0 mt-1">
+                                {{ completed_meetings }}
+                            </h3>
+
+                        </div>
+
+                        <div class="bg-success bg-opacity-10 text-success rounded-3 p-3">
+
+                            <i class="fa-solid fa-circle-check fa-lg"></i>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- CANCELLED -->
+
+        <div class="col-md-6 col-xl-3">
+
+            <div class="card border-0 shadow-sm h-100">
+
+                <div class="card-body p-4">
+
+                    <div class="d-flex justify-content-between align-items-center">
+
+                        <div>
+
+                            <small class="text-muted">
+                                Cancelled
+                            </small>
+
+                            <h3 class="fw-bold mb-0 mt-1">
+                                {{ cancelled_meetings }}
+                            </h3>
+
+                        </div>
+
+                        <div class="bg-danger bg-opacity-10 text-danger rounded-3 p-3">
+
+                            <i class="fa-solid fa-circle-xmark fa-lg"></i>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ================================================== -->
+    <!-- SEARCH AND FILTERS -->
+    <!-- ================================================== -->
+
+    <div class="card border-0 shadow-sm mb-4">
+
+        <div class="card-body p-3">
+
+            <div class="row g-3 align-items-end">
+
+                <!-- SEARCH -->
+
+                <div class="col-lg-5">
+
+                    <label for="meetingSearch"
+                           class="form-label fw-semibold small">
+                        Search Meetings
+                    </label>
+
+                    <div class="input-group">
+
+                        <span class="input-group-text bg-light border-end-0">
+
+                            <i class="fa-solid fa-magnifying-glass text-muted"></i>
+
+                        </span>
+
+                        <input
+                            type="search"
+                            id="meetingSearch"
+                            class="form-control border-start-0"
+                            placeholder="Search title, project, or organizer..."
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <!-- STATUS FILTER -->
+
+                <div class="col-md-6 col-lg-3">
+
+                    <label for="statusFilter"
+                           class="form-label fw-semibold small">
+                        Meeting Status
+                    </label>
+
+                    <select id="statusFilter"
+                            class="form-select">
+
+                        <option value="all">
+                            All Statuses
+                        </option>
+
+                        <option value="scheduled">
+                            Scheduled
+                        </option>
+
+                        <option value="completed">
+                            Completed
+                        </option>
+
+                        <option value="cancelled">
+                            Cancelled
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- DATE FILTER -->
+
+                <div class="col-md-6 col-lg-2">
+
+                    <label for="dateFilter"
+                           class="form-label fw-semibold small">
+                        Date
+                    </label>
+
+                    <select id="dateFilter"
+                            class="form-select">
+
+                        <option value="all">
+                            All Dates
+                        </option>
+
+                        <option value="upcoming">
+                            Upcoming
+                        </option>
+
+                        <option value="today">
+                            Today
+                        </option>
+
+                        <option value="past">
+                            Past
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- RESET -->
+
+                <div class="col-lg-2">
+
+                    <button
+                        type="button"
+                        id="resetFilters"
+                        class="btn btn-outline-secondary w-100"
+                    >
+
+                        <i class="fa-solid fa-rotate-left me-1"></i>
+                        Reset
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ================================================== -->
+    <!-- MEETINGS TABLE -->
+    <!-- ================================================== -->
+
+    <div class="card border-0 shadow-sm">
+
+        <div class="card-header bg-white border-bottom py-3">
+
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+
+                <h5 class="fw-bold mb-0">
+
+                    <i class="fa-solid fa-list text-primary me-2"></i>
+                    All Meetings
+
+                </h5>
+
+                <span class="badge bg-light text-dark border">
+
+                    Showing
+                    <span id="visibleMeetingCount">
+                        {{ total_meetings }}
+                    </span>
+                    of {{ total_meetings }}
+
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <div class="card-body p-0">
+
+            {% if meetings %}
+
+            <div class="table-responsive">
+
+                <table class="table table-hover align-middle mb-0">
+
+                    <thead class="table-light">
+
+                        <tr>
+
+                            <th class="px-4 py-3">
+                                Meeting
+                            </th>
+
+                            <th>
+                                Project
+                            </th>
+
+                            <th>
+                                Organizer
+                            </th>
+
+                            <th>
+                                Date
+                            </th>
+
+                            <th>
+                                Time
+                            </th>
+
+                            <th>
+                                Participants
+                            </th>
+
+                            <th>
+                                Status
+                            </th>
+
+                            <th class="text-end px-4">
+                                Actions
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody id="meetingsTableBody">
+
+                        {% for meeting in meetings %}
+
+                        <tr
+                            class="meeting-row"
+                            data-search="{{ meeting.title|lower }} {{ meeting.description|lower }} {{ meeting.project.name|lower }} {{ meeting.organizer.username|lower }}"
+                            data-status="{{ meeting.status }}"
+                            data-upcoming="{% if meeting.is_upcoming %}true{% else %}false{% endif %}"
+                            data-today="{% if meeting.is_today %}true{% else %}false{% endif %}"
+                            data-past="{% if meeting.is_past %}true{% else %}false{% endif %}"
+                        >
+
+                            <!-- MEETING TITLE -->
+
+                            <td class="px-4">
+
+                                <a
+                                    href="{% url 'meeting_detail' meeting.id %}"
+                                    class="fw-semibold text-decoration-none"
+                                >
+
+                                    {{ meeting.title }}
+
+                                </a>
+
+                                {% if meeting.description %}
+
+                                <small class="text-muted d-block mt-1">
+
+                                    {{ meeting.description|truncatechars:65 }}
+
+                                </small>
+
+                                {% endif %}
+
+                                {% if meeting.is_upcoming %}
+
+                                <span class="badge bg-info bg-opacity-10 text-info mt-2">
+
+                                    <i class="fa-solid fa-arrow-trend-up me-1"></i>
+                                    Upcoming
+
+                                </span>
+
+                                {% elif meeting.is_today and meeting.status == "scheduled" %}
+
+                                <span class="badge bg-warning text-dark mt-2">
+
+                                    <i class="fa-solid fa-calendar-day me-1"></i>
+                                    Today
+
+                                </span>
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <!-- PROJECT -->
+
+                            <td>
+
+                                <span class="fw-medium">
+
+                                    {{ meeting.project.name }}
+
+                                </span>
+
+                            </td>
+
+
+                            <!-- ORGANIZER -->
+
+                            <td>
+
+                                <div class="d-flex align-items-center gap-2">
+
+                                    <div
+                                        class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center flex-shrink-0"
+                                        style="width: 34px; height: 34px;"
+                                    >
+
+                                        {{ meeting.organizer.username|first|upper }}
+
+                                    </div>
+
+                                    <span>
+
+                                        {{ meeting.organizer.username }}
+
+                                    </span>
+
+                                </div>
+
+                            </td>
+
+
+                            <!-- DATE -->
+
+                            <td>
+
+                                <div class="fw-semibold">
+
+                                    {{ meeting.meeting_date|date:"d M Y" }}
+
+                                </div>
+
+                                <small class="text-muted">
+
+                                    {{ meeting.meeting_date|date:"l" }}
+
+                                </small>
+
+                            </td>
+
+
+                            <!-- TIME -->
+
+                            <td>
+
+                                <span class="text-muted text-nowrap">
+
+                                    {{ meeting.start_time|time:"h:i A" }}
+
+                                    {% if meeting.end_time %}
+
+                                    <span class="d-block small">
+
+                                        to {{ meeting.end_time|time:"h:i A" }}
+
+                                    </span>
+
+                                    {% endif %}
+
+                                </span>
+
+                            </td>
+
+
+                            <!-- PARTICIPANTS -->
+
+                            <td>
+
+                                <span class="badge bg-light text-dark border">
+
+                                    <i class="fa-solid fa-users me-1"></i>
+
+                                    {{ meeting.participant_count }}
+
+                                </span>
+
+                            </td>
+
+
+                            <!-- STATUS -->
+
+                            <td>
+
+                                {% if meeting.status == "scheduled" %}
+
+                                <span class="badge bg-primary">
+
+                                    <i class="fa-solid fa-clock me-1"></i>
+                                    Scheduled
+
+                                </span>
+
+                                {% elif meeting.status == "completed" %}
+
+                                <span class="badge bg-success">
+
+                                    <i class="fa-solid fa-check me-1"></i>
+                                    Completed
+
+                                </span>
+
+                                {% elif meeting.status == "cancelled" %}
+
+                                <span class="badge bg-danger">
+
+                                    <i class="fa-solid fa-xmark me-1"></i>
+                                    Cancelled
+
+                                </span>
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <!-- ACTIONS -->
+
+                            <td class="text-end px-4">
+
+                                <div class="d-inline-flex align-items-center gap-1">
+
+                                    <!-- VIEW -->
+
+                                    <a
+                                        href="{% url 'meeting_detail' meeting.id %}"
+                                        class="btn btn-sm btn-outline-primary"
+                                        title="View Meeting"
+                                        aria-label="View meeting"
+                                    >
+
+                                        <i class="fa-solid fa-eye"></i>
+
+                                    </a>
+
+
+                                    <!-- MANAGE -->
+
+                                    {% if user.is_superuser or meeting.project.owner_id == user.id and user_role == "admin" or meeting.project.owner_id == user.id and user_role == "manager" %}
+
+                                    <a
+                                        href="{% url 'meeting_edit' meeting.id %}"
+                                        class="btn btn-sm btn-outline-secondary"
+                                        title="Edit Meeting"
+                                        aria-label="Edit meeting"
+                                    >
+
+                                        <i class="fa-solid fa-pen"></i>
+
+                                    </a>
+
+                                    <a
+                                        href="{% url 'meeting_delete' meeting.id %}"
+                                        class="btn btn-sm btn-outline-danger"
+                                        title="Delete Meeting"
+                                        aria-label="Delete meeting"
+                                    >
+
+                                        <i class="fa-solid fa-trash"></i>
+
+                                    </a>
+
+                                    {% endif %}
+
+                                </div>
+
+                            </td>
+
+                        </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+
+            <!-- NO FILTER RESULTS -->
+
+            <div
+                id="noFilterResults"
+                class="text-center py-5 d-none"
+            >
+
+                <i class="fa-solid fa-magnifying-glass text-muted fs-2 mb-3"></i>
+
+                <h5 class="fw-bold">
+                    No Matching Meetings
+                </h5>
+
+                <p class="text-muted mb-0">
+                    Try changing your search or filter options.
+                </p>
+
+            </div>
+
+
+            {% else %}
+
+            <!-- NO MEETINGS -->
+
+            <div class="text-center py-5 px-3">
+
+                <div
+                    class="rounded-circle bg-primary bg-opacity-10 text-primary d-inline-flex align-items-center justify-content-center mb-3"
+                    style="width: 76px; height: 76px;"
+                >
+
+                    <i class="fa-solid fa-calendar-days fa-2x"></i>
+
+                </div>
+
+                <h4 class="fw-bold mb-2">
+                    No Meetings Yet
+                </h4>
+
+                <p class="text-muted mb-4">
+
+                    {% if can_create_meeting %}
+
+                    Schedule your first project meeting
+                    to collaborate with your team.
+
+                    {% else %}
+
+                    There are no meetings available
+                    for your assigned projects.
+
+                    {% endif %}
+
+                </p>
+
+                {% if can_create_meeting %}
+
+                <a
+                    href="{% url 'meeting_create' %}"
+                    class="btn btn-primary"
+                >
+
+                    <i class="fa-solid fa-plus me-2"></i>
+                    Schedule Your First Meeting
+
+                </a>
+
+                {% endif %}
+
+            </div>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+
+    <!-- ================================================== -->
+    <!-- ACCESS INFORMATION -->
+    <!-- ================================================== -->
+
+    {% if user_role == "employee" %}
+
+    <div class="alert alert-light border mt-4 mb-0">
+
+        <i class="fa-solid fa-circle-info text-primary me-2"></i>
+
+        <span class="small">
+            You can view meetings for projects where you are a member.
+            Meeting scheduling and management are handled by
+            project Admins and Managers.
+        </span>
+
+    </div>
+
+    {% endif %}
+
+</div>
+
+
+<!-- ====================================================== -->
+<!-- CLIENT-SIDE SEARCH AND FILTERING -->
+<!-- ====================================================== -->
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const searchInput = document.getElementById("meetingSearch");
+    const statusFilter = document.getElementById("statusFilter");
+    const dateFilter = document.getElementById("dateFilter");
+    const resetButton = document.getElementById("resetFilters");
+
+    const meetingRows = Array.from(
+        document.querySelectorAll(".meeting-row")
+    );
+
+    const visibleCount = document.getElementById(
+        "visibleMeetingCount"
+    );
+
+    const noFilterResults = document.getElementById(
+        "noFilterResults"
+    );
+
+    function applyFilters() {
+
+        const searchTerm = searchInput.value
+            .trim()
+            .toLowerCase();
+
+        const selectedStatus = statusFilter.value;
+        const selectedDate = dateFilter.value;
+
+        let count = 0;
+
+        meetingRows.forEach(function (row) {
+
+            const searchableText = row.dataset.search || "";
+            const status = row.dataset.status || "";
+
+            const isUpcoming = row.dataset.upcoming === "true";
+            const isToday = row.dataset.today === "true";
+            const isPast = row.dataset.past === "true";
+
+            const matchesSearch = (
+                searchableText.includes(searchTerm)
+            );
+
+            const matchesStatus = (
+                selectedStatus === "all" ||
+                status === selectedStatus
+            );
+
+            let matchesDate = true;
+
+            if (selectedDate === "upcoming") {
+                matchesDate = isUpcoming;
+            } else if (selectedDate === "today") {
+                matchesDate = isToday;
+            } else if (selectedDate === "past") {
+                matchesDate = isPast;
+            }
+
+            const shouldShow = (
+                matchesSearch &&
+                matchesStatus &&
+                matchesDate
+            );
+
+            row.classList.toggle(
+                "d-none",
+                !shouldShow
+            );
+
+            if (shouldShow) {
+                count++;
+            }
+
+        });
+
+        if (visibleCount) {
+            visibleCount.textContent = count;
+        }
+
+        if (noFilterResults && meetingRows.length > 0) {
+
+            noFilterResults.classList.toggle(
+                "d-none",
+                count !== 0
+            );
+
+        }
+
+    }
+
+    if (searchInput && statusFilter && dateFilter) {
+
+        searchInput.addEventListener(
+            "input",
+            applyFilters
+        );
+
+        statusFilter.addEventListener(
+            "change",
+            applyFilters
+        );
+
+        dateFilter.addEventListener(
+            "change",
+            applyFilters
+        );
+
+    }
+
+    if (resetButton) {
+
+        resetButton.addEventListener(
+            "click",
+            function () {
+
+                searchInput.value = "";
+                statusFilter.value = "all";
+                dateFilter.value = "all";
+
+                applyFilters();
+
+            }
+        );
+
+    }
+
+});
+</script>
+
+{% endblock %}

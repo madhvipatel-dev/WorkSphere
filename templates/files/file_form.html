@@ -1,0 +1,637 @@
+
+{% extends "base.html" %}
+
+{% block title %}{{ page_title }} | WorkSphere{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid py-4">
+
+    <!-- ================================================== -->
+    <!-- PAGE HEADER -->
+    <!-- ================================================== -->
+
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+
+        <div>
+            <h2 class="fw-bold mb-1">
+
+                {% if form.instance.pk %}
+                    <i class="fa-solid fa-file-pen text-primary me-2"></i>
+                {% else %}
+                    <i class="fa-solid fa-cloud-arrow-up text-primary me-2"></i>
+                {% endif %}
+
+                {{ page_title }}
+            </h2>
+
+            <p class="text-muted mb-0">
+                {% if form.instance.pk %}
+                    Update file information or replace the existing document.
+                {% else %}
+                    Upload a document to share with your authorized project team.
+                {% endif %}
+            </p>
+        </div>
+
+        <a href="{% url 'file_list' %}"
+           class="btn btn-outline-secondary">
+
+            <i class="fa-solid fa-arrow-left me-2"></i>
+            Back to Files
+
+        </a>
+
+    </div>
+
+
+    <!-- ================================================== -->
+    <!-- FORM -->
+    <!-- ================================================== -->
+
+    <div class="row justify-content-center">
+
+        <div class="col-lg-9 col-xl-8">
+
+            <div class="card border-0 shadow-sm">
+
+                <div class="card-header bg-white border-0 px-4 py-4">
+
+                    <h5 class="fw-bold mb-1">
+
+                        <i class="fa-solid fa-circle-info text-primary me-2"></i>
+                        File Information
+
+                    </h5>
+
+                    <p class="text-muted small mb-0">
+                        Fields marked with
+                        <span class="text-danger">*</span>
+                        are required.
+                    </p>
+
+                </div>
+
+
+                <div class="card-body p-4">
+
+                    <form
+                        method="post"
+                        enctype="multipart/form-data"
+                        id="projectFileForm"
+                    >
+
+                        {% csrf_token %}
+
+
+                        <!-- ================================== -->
+                        <!-- FORM ERRORS -->
+                        <!-- ================================== -->
+
+                        {% if form.non_field_errors %}
+
+                        <div class="alert alert-danger" role="alert">
+
+                            <div class="d-flex align-items-start">
+
+                                <i class="fa-solid fa-circle-exclamation me-2 mt-1"></i>
+
+                                <div>
+
+                                    <strong>
+                                        Please correct the following errors:
+                                    </strong>
+
+                                    <ul class="mb-0 mt-2">
+
+                                        {% for error in form.non_field_errors %}
+                                        <li>{{ error }}</li>
+                                        {% endfor %}
+
+                                    </ul>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        {% endif %}
+
+
+                        <!-- ================================== -->
+                        <!-- PROJECT -->
+                        <!-- ================================== -->
+
+                        <div class="mb-4">
+
+                            <label
+                                for="{{ form.project.id_for_label }}"
+                                class="form-label fw-semibold"
+                            >
+
+                                <i class="fa-solid fa-folder text-primary me-2"></i>
+                                Project
+
+                                <span class="text-danger">*</span>
+
+                            </label>
+
+                            {{ form.project }}
+
+                            {% if form.project.errors %}
+
+                            <div class="text-danger small mt-2" role="alert">
+
+                                {% for error in form.project.errors %}
+                                    <div>{{ error }}</div>
+                                {% endfor %}
+
+                            </div>
+
+                            {% endif %}
+
+                            {% if form.project.help_text %}
+
+                            <div class="form-text">
+                                {{ form.project.help_text }}
+                            </div>
+
+                            {% elif form.instance.pk %}
+
+                            <div class="form-text">
+                                The project cannot be changed after upload.
+                            </div>
+
+                            {% else %}
+
+                            <div class="form-text">
+                                Select a project you are authorized to access.
+                            </div>
+
+                            {% endif %}
+
+                        </div>
+
+
+                        <!-- ================================== -->
+                        <!-- FILE TITLE -->
+                        <!-- ================================== -->
+
+                        <div class="mb-4">
+
+                            <label
+                                for="{{ form.title.id_for_label }}"
+                                class="form-label fw-semibold"
+                            >
+
+                                <i class="fa-solid fa-heading text-primary me-2"></i>
+                                File Title
+
+                                <span class="text-danger">*</span>
+
+                            </label>
+
+                            {{ form.title }}
+
+                            {% if form.title.errors %}
+
+                            <div class="text-danger small mt-2" role="alert">
+
+                                {% for error in form.title.errors %}
+                                    <div>{{ error }}</div>
+                                {% endfor %}
+
+                            </div>
+
+                            {% endif %}
+
+                            <div class="form-text">
+                                Give your document a clear, descriptive title.
+                            </div>
+
+                        </div>
+
+
+                        <!-- ================================== -->
+                        <!-- DESCRIPTION -->
+                        <!-- ================================== -->
+
+                        <div class="mb-4">
+
+                            <label
+                                for="{{ form.description.id_for_label }}"
+                                class="form-label fw-semibold"
+                            >
+
+                                <i class="fa-solid fa-align-left text-primary me-2"></i>
+                                Description
+
+                                <span class="text-muted fw-normal small">
+                                    (Optional)
+                                </span>
+
+                            </label>
+
+                            {{ form.description }}
+
+                            {% if form.description.errors %}
+
+                            <div class="text-danger small mt-2" role="alert">
+
+                                {% for error in form.description.errors %}
+                                    <div>{{ error }}</div>
+                                {% endfor %}
+
+                            </div>
+
+                            {% endif %}
+
+                            <div class="form-text">
+                                Explain what this file contains or how it should be used.
+                            </div>
+
+                        </div>
+
+
+                        <!-- ================================== -->
+                        <!-- CURRENT FILE -->
+                        <!-- ================================== -->
+
+                        {% if form.instance.pk and form.instance.file %}
+
+                        <div class="mb-4">
+
+                            <label class="form-label fw-semibold">
+
+                                <i class="fa-solid fa-file-circle-check text-success me-2"></i>
+                                Current File
+
+                            </label>
+
+                            <div class="border rounded-3 p-3 bg-light">
+
+                                <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+
+                                    <div class="d-flex align-items-center">
+
+                                        <div class="rounded-3 bg-success bg-opacity-10 p-3 me-3">
+
+                                            <i class="fa-solid fa-file-lines text-success fs-4"></i>
+
+                                        </div>
+
+                                        <div>
+
+                                            <div class="fw-semibold text-break">
+                                                {{ form.instance.file.name }}
+                                            </div>
+
+                                            <small class="text-muted">
+                                                Uploaded document
+                                            </small>
+
+                                        </div>
+
+                                    </div>
+
+                                    <a
+                                        href="{% url 'file_download' form.instance.pk %}"
+                                        class="btn btn-sm btn-outline-success"
+                                    >
+
+                                        <i class="fa-solid fa-download me-1"></i>
+                                        Download
+
+                                    </a>
+
+                                </div>
+
+                            </div>
+
+                            <div class="form-text">
+                                You can leave the upload field empty to keep this file.
+                            </div>
+
+                        </div>
+
+                        {% endif %}
+
+
+                        <!-- ================================== -->
+                        <!-- FILE UPLOAD -->
+                        <!-- ================================== -->
+
+                        <div class="mb-4">
+
+                            <label
+                                for="{{ form.file.id_for_label }}"
+                                class="form-label fw-semibold"
+                            >
+
+                                <i class="fa-solid fa-file-arrow-up text-primary me-2"></i>
+
+                                {% if form.instance.pk %}
+                                    Replace File
+                                {% else %}
+                                    Select File
+                                    <span class="text-danger">*</span>
+                                {% endif %}
+
+                            </label>
+
+                            {{ form.file }}
+
+                            {% if form.file.errors %}
+
+                            <div class="text-danger small mt-2" role="alert">
+
+                                {% for error in form.file.errors %}
+                                    <div>{{ error }}</div>
+                                {% endfor %}
+
+                            </div>
+
+                            {% endif %}
+
+                            <div class="form-text">
+
+                                Maximum size:
+                                <strong>10 MB</strong>
+
+                                <div class="mt-1">
+
+                                    Supported formats:
+                                    PDF, DOC, DOCX, XLS, XLSX,
+                                    PPT, PPTX, TXT, CSV,
+                                    JPG, JPEG, PNG, WEBP and ZIP.
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- SELECTED FILE INFORMATION -->
+
+                            <div
+                                id="selectedFileInfo"
+                                class="alert alert-light border mt-3 d-none"
+                                aria-live="polite"
+                            >
+
+                                <div class="d-flex align-items-start">
+
+                                    <i class="fa-solid fa-file-circle-check text-success me-2 mt-1"></i>
+
+                                    <div>
+
+                                        <div class="fw-semibold">
+                                            Selected File
+                                        </div>
+
+                                        <div
+                                            id="selectedFileName"
+                                            class="small text-break"
+                                        ></div>
+
+                                        <div
+                                            id="selectedFileSize"
+                                            class="small text-muted"
+                                        ></div>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- FILE SIZE ERROR -->
+
+                            <div
+                                id="clientFileError"
+                                class="alert alert-danger mt-3 d-none"
+                                role="alert"
+                            ></div>
+
+                        </div>
+
+
+                        <!-- ================================== -->
+                        <!-- SHARING INFORMATION -->
+                        <!-- ================================== -->
+
+                        <div class="alert alert-light border mb-4">
+
+                            <div class="d-flex align-items-start">
+
+                                <i class="fa-solid fa-shield-halved text-primary me-3 mt-1"></i>
+
+                                <div>
+
+                                    <strong>
+                                        Project File Access
+                                    </strong>
+
+                                    <p class="text-muted small mb-0 mt-1">
+
+                                        Uploaded documents are intended for
+                                        authorized internal members of the
+                                        selected project.
+
+                                        Clients do not have access to the
+                                        internal File Management module.
+
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- ================================== -->
+                        <!-- ACTION BUTTONS -->
+                        <!-- ================================== -->
+
+                        <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+
+                            {% if form.instance.pk %}
+
+                            <a
+                                href="{% url 'file_detail' form.instance.pk %}"
+                                class="btn btn-outline-secondary"
+                            >
+
+                                <i class="fa-solid fa-xmark me-2"></i>
+                                Cancel
+
+                            </a>
+
+                            {% else %}
+
+                            <a
+                                href="{% url 'file_list' %}"
+                                class="btn btn-outline-secondary"
+                            >
+
+                                <i class="fa-solid fa-xmark me-2"></i>
+                                Cancel
+
+                            </a>
+
+                            {% endif %}
+
+
+                            <button
+                                type="submit"
+                                id="submitFileButton"
+                                class="btn btn-primary px-4"
+                            >
+
+                                {% if form.instance.pk %}
+
+                                    <i class="fa-solid fa-floppy-disk me-2"></i>
+                                    Save Changes
+
+                                {% else %}
+
+                                    <i class="fa-solid fa-cloud-arrow-up me-2"></i>
+                                    Upload File
+
+                                {% endif %}
+
+                            </button>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ====================================================== -->
+<!-- CLIENT-SIDE FILE VALIDATION -->
+<!-- ====================================================== -->
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const form = document.getElementById("projectFileForm");
+
+    const fileInput = document.getElementById(
+        "{{ form.file.id_for_label|escapejs }}"
+    );
+
+    const selectedFileInfo = document.getElementById(
+        "selectedFileInfo"
+    );
+
+    const selectedFileName = document.getElementById(
+        "selectedFileName"
+    );
+
+    const selectedFileSize = document.getElementById(
+        "selectedFileSize"
+    );
+
+    const clientFileError = document.getElementById(
+        "clientFileError"
+    );
+
+    const submitButton = document.getElementById(
+        "submitFileButton"
+    );
+
+    const maxFileSize = 10 * 1024 * 1024;
+
+    const allowedExtensions = [
+        "pdf", "doc", "docx",
+        "xls", "xlsx",
+        "ppt", "pptx",
+        "txt", "csv",
+        "jpg", "jpeg", "png",
+        "webp", "zip"
+    ];
+
+    function validateSelectedFile() {
+
+        clientFileError.classList.add("d-none");
+        clientFileError.textContent = "";
+
+        selectedFileInfo.classList.add("d-none");
+
+        submitButton.disabled = false;
+
+        if (!fileInput || !fileInput.files.length) {
+            return true;
+        }
+
+        const file = fileInput.files[0];
+
+        const fileName = file.name;
+
+        const extension = fileName.includes(".")
+            ? fileName.split(".").pop().toLowerCase()
+            : "";
+
+        selectedFileName.textContent = fileName;
+
+        selectedFileSize.textContent =
+            (file.size / (1024 * 1024)).toFixed(2) + " MB";
+
+        selectedFileInfo.classList.remove("d-none");
+
+        let errorMessage = "";
+
+        if (file.size > maxFileSize) {
+
+            errorMessage = "The selected file exceeds the 10 MB limit.";
+
+        } else if (!allowedExtensions.includes(extension)) {
+
+            errorMessage = "This file format is not supported.";
+
+        }
+
+        if (errorMessage) {
+
+            clientFileError.textContent = errorMessage;
+            clientFileError.classList.remove("d-none");
+
+            submitButton.disabled = true;
+
+            return false;
+        }
+
+        return true;
+    }
+
+    if (fileInput) {
+        fileInput.addEventListener(
+            "change",
+            validateSelectedFile
+        );
+    }
+
+    form.addEventListener("submit", function (event) {
+
+        if (!validateSelectedFile()) {
+            event.preventDefault();
+        }
+
+    });
+
+});
+</script>
+
+{% endblock %}

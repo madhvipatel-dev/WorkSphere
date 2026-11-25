@@ -1,0 +1,687 @@
+
+{% extends "base.html" %}
+
+{% block title %}Task Details | WorkSphere{% endblock %}
+
+{% block content %}
+<div class="page-content">
+    <div class="dashboard-page">
+
+        <!-- Page Header -->
+        <div class="dashboard-header">
+            <div>
+                <h1>Task Details</h1>
+                <p>
+                    View task information, progress,
+                    submissions and team discussions.
+                </p>
+            </div>
+
+            <div class="d-flex flex-wrap gap-2">
+
+                {% if user_role == "employee" %}
+                    <a
+                        href="{% url 'employee_task_list' %}"
+                        class="btn btn-outline-secondary"
+                    >
+                        <i class="fa-solid fa-arrow-left"></i>
+                        My Tasks
+                    </a>
+                {% else %}
+                    <a
+                        href="{% url 'task_list' %}"
+                        class="btn btn-outline-secondary"
+                    >
+                        <i class="fa-solid fa-arrow-left"></i>
+                        All Tasks
+                    </a>
+                {% endif %}
+
+                {% if can_manage_task %}
+                    <a
+                        href="{% url 'task_edit' task.id %}"
+                        class="btn btn-primary"
+                    >
+                        <i class="fa-solid fa-pen"></i>
+                        Edit Task
+                    </a>
+
+                    <a
+                        href="{% url 'task_delete' task.id %}"
+                        class="btn btn-outline-danger"
+                    >
+                        <i class="fa-solid fa-trash"></i>
+                        Delete
+                    </a>
+                {% endif %}
+
+            </div>
+        </div>
+
+        <!-- Task Overview -->
+        <div class="dashboard-panel">
+
+            <div class="dashboard-section-title">
+                <div>
+                    <h2>{{ task.title }}</h2>
+                    <p>Task overview and current status</p>
+                </div>
+
+                <div>
+                    {% if task.status == "completed" %}
+                        <span class="badge bg-success">
+                            <i class="fa-solid fa-circle-check"></i>
+                            Completed
+                        </span>
+
+                    {% elif task.status == "in_progress" %}
+                        <span class="badge bg-primary">
+                            <i class="fa-solid fa-spinner"></i>
+                            In Progress
+                        </span>
+
+                    {% elif task.status == "blocked" %}
+                        <span class="badge bg-danger">
+                            <i class="fa-solid fa-ban"></i>
+                            Blocked
+                        </span>
+
+                    {% else %}
+                        <span class="badge bg-secondary">
+                            <i class="fa-solid fa-list"></i>
+                            To Do
+                        </span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="row g-4">
+
+                <!-- Task Description -->
+                <div class="col-lg-8">
+
+                    <h6 class="fw-semibold mb-3">
+                        <i class="fa-solid fa-align-left"></i>
+                        Task Description
+                    </h6>
+
+                    {% if task.description %}
+                        <div class="task-description">
+                            {{ task.description }}
+                        </div>
+                    {% else %}
+                        <p class="text-muted">
+                            No description provided.
+                        </p>
+                    {% endif %}
+
+                    <div class="d-flex flex-wrap gap-2 mt-4">
+
+                        <span class="badge bg-light text-dark border">
+                            <i class="fa-solid fa-folder"></i>
+                            {{ task.project.name }}
+                        </span>
+
+                        {% if task.priority == "urgent" %}
+                            <span class="badge bg-danger">
+                                Urgent Priority
+                            </span>
+
+                        {% elif task.priority == "high" %}
+                            <span class="badge bg-warning text-dark">
+                                High Priority
+                            </span>
+
+                        {% elif task.priority == "medium" %}
+                            <span class="badge bg-info text-dark">
+                                Medium Priority
+                            </span>
+
+                        {% else %}
+                            <span class="badge bg-secondary">
+                                Low Priority
+                            </span>
+                        {% endif %}
+
+                    </div>
+                </div>
+
+                <!-- Task Metadata -->
+                <div class="col-lg-4">
+
+                    <div class="task-info-card">
+
+                        <div class="mb-3">
+                            <small class="text-muted d-block mb-1">
+                                Assigned To
+                            </small>
+
+                            {% if task.assigned_to %}
+                                <strong>
+                                    {% if task.assigned_to.get_full_name %}
+                                        {{ task.assigned_to.get_full_name }}
+                                    {% else %}
+                                        {{ task.assigned_to.username }}
+                                    {% endif %}
+                                </strong>
+                            {% else %}
+                                <span class="text-muted">
+                                    Unassigned
+                                </span>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <small class="text-muted d-block mb-1">
+                                Created By
+                            </small>
+
+                            {% if task.created_by %}
+                                <strong>
+                                    {{ task.created_by.get_full_name|default:task.created_by.username }}
+                                </strong>
+                            {% else %}
+                                <span class="text-muted">
+                                    Not available
+                                </span>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <small class="text-muted d-block mb-1">
+                                Due Date
+                            </small>
+
+                            {% if task.due_date %}
+                                <strong>
+                                    {{ task.due_date|date:"d M Y" }}
+                                </strong>
+                            {% else %}
+                                <span class="text-muted">
+                                    No deadline
+                                </span>
+                            {% endif %}
+                        </div>
+
+                        <div>
+                            <small class="text-muted d-block mb-1">
+                                Last Updated
+                            </small>
+
+                            <strong>
+                                {{ task.updated_at|date:"d M Y, h:i A" }}
+                            </strong>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- Submission Status -->
+        <div class="dashboard-panel mt-4">
+
+            <div class="dashboard-section-title">
+                <div>
+                    <h2>Work Submission Status</h2>
+                    <p>
+                        Current review status of the submitted work.
+                    </p>
+                </div>
+            </div>
+
+            {% if submission_state == "none" %}
+
+                <div class="alert alert-secondary mb-0">
+                    <i class="fa-solid fa-circle-info"></i>
+                    No work has been submitted for this task yet.
+                </div>
+
+            {% elif submission_state == "pending" %}
+
+                <div class="alert alert-warning mb-0">
+                    <i class="fa-solid fa-clock"></i>
+                    <strong>Pending Review</strong>
+                    — Work has been submitted and is awaiting
+                    Manager approval.
+                </div>
+
+            {% elif submission_state == "approved" %}
+
+                <div class="alert alert-success mb-0">
+                    <i class="fa-solid fa-circle-check"></i>
+                    <strong>Approved</strong>
+                    — The submitted work has been approved.
+                </div>
+
+            {% elif submission_state == "rejected" %}
+
+                <div class="alert alert-danger mb-0">
+                    <i class="fa-solid fa-circle-xmark"></i>
+                    <strong>Rejected</strong>
+                    — The employee may revise and resubmit work.
+                </div>
+
+            {% elif submission_state == "changes_requested" %}
+
+                <div class="alert alert-info mb-0">
+                    <i class="fa-solid fa-rotate"></i>
+                    <strong>Changes Requested</strong>
+                    — The employee should review feedback
+                    and submit updated work.
+                </div>
+
+            {% endif %}
+
+            {% if latest_submission %}
+
+                <div class="mt-4">
+
+                    <small class="text-muted d-block mb-1">
+                        Latest Submission
+                    </small>
+
+                    <strong>
+                        {{ latest_submission.submitted_at|date:"d M Y, h:i A" }}
+                    </strong>
+
+                </div>
+
+                {% if latest_submission.manager_feedback %}
+
+                    <div class="task-feedback-card mt-3">
+
+                        <h6 class="fw-semibold mb-2">
+                            <i class="fa-solid fa-comment-dots"></i>
+                            Latest Manager Feedback
+                        </h6>
+
+                        <div class="task-description">
+                            {{ latest_submission.manager_feedback }}
+                        </div>
+
+                    </div>
+
+                {% endif %}
+
+            {% endif %}
+
+            <!-- Employee Actions -->
+            {% if can_work_on_task %}
+
+                <div class="task-action-area mt-4">
+
+                    {% if submission_state == "pending" %}
+
+                        <span class="text-muted">
+                            <i class="fa-solid fa-lock"></i>
+                            Waiting for Manager review.
+                        </span>
+
+                    {% elif submission_state == "approved" %}
+
+                        <span class="text-success fw-semibold">
+                            <i class="fa-solid fa-check-circle"></i>
+                            Work approved. No further submission needed.
+                        </span>
+
+                    {% elif task.status == "completed" %}
+
+                        <a
+                            href="{% url 'submit_work' task.id %}"
+                            class="btn btn-primary"
+                        >
+                            <i class="fa-solid fa-paper-plane"></i>
+
+                            {% if submission_state == "rejected" or submission_state == "changes_requested" %}
+                                Resubmit Work
+                            {% else %}
+                                Submit Work
+                            {% endif %}
+                        </a>
+
+                    {% else %}
+
+                        <span class="text-muted">
+                            Mark this task as Completed from My Tasks
+                            before submitting work.
+                        </span>
+
+                    {% endif %}
+
+                </div>
+
+            {% endif %}
+
+        </div>
+
+        <!-- Submission History -->
+        <div class="dashboard-panel mt-4">
+
+            <div class="dashboard-section-title">
+                <div>
+                    <h2>Submission History</h2>
+                    <p>
+                        Previous work submissions and review decisions.
+                    </p>
+                </div>
+            </div>
+
+            {% if submissions %}
+
+                <div class="table-responsive">
+
+                    <table class="table align-middle task-history-table">
+
+                        <thead>
+                            <tr>
+                                <th>Submitted By</th>
+                                <th>Submitted On</th>
+                                <th>Description</th>
+                                <th>Attachment</th>
+                                <th>Status</th>
+                                <th>Manager Feedback</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+
+                            {% for submission in submissions %}
+
+                                <tr>
+
+                                    <td>
+                                        <strong>
+                                            {{ submission.submitted_by.username }}
+                                        </strong>
+                                    </td>
+
+                                    <td>
+                                        {{ submission.submitted_at|date:"d M Y, h:i A" }}
+                                    </td>
+
+                                    <td>
+                                        <div class="task-history-text">
+                                            {{ submission.comment }}
+                                        </div>
+                                    </td>
+
+                                    <td>
+
+                                        {% if submission.attachment %}
+
+                                            <a
+                                                href="{{ submission.attachment.url }}"
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                class="btn btn-sm btn-outline-primary"
+                                            >
+                                                <i class="fa-solid fa-paperclip"></i>
+                                                View File
+                                            </a>
+
+                                        {% else %}
+
+                                            <span class="text-muted">
+                                                No attachment
+                                            </span>
+
+                                        {% endif %}
+
+                                    </td>
+
+                                    <td>
+
+                                        {% if submission.status == "pending" %}
+                                            <span class="badge bg-warning text-dark">
+                                                Pending
+                                            </span>
+
+                                        {% elif submission.status == "approved" %}
+                                            <span class="badge bg-success">
+                                                Approved
+                                            </span>
+
+                                        {% elif submission.status == "rejected" %}
+                                            <span class="badge bg-danger">
+                                                Rejected
+                                            </span>
+
+                                        {% elif submission.status == "changes_requested" %}
+                                            <span class="badge bg-info text-dark">
+                                                Changes Requested
+                                            </span>
+
+                                        {% else %}
+                                            <span class="badge bg-secondary">
+                                                {{ submission.get_status_display }}
+                                            </span>
+                                        {% endif %}
+
+                                    </td>
+
+                                    <td>
+                                        {% if submission.manager_feedback %}
+                                            <div class="task-history-text">
+                                                {{ submission.manager_feedback }}
+                                            </div>
+                                        {% else %}
+                                            <span class="text-muted">
+                                                No feedback
+                                            </span>
+                                        {% endif %}
+                                    </td>
+
+                                </tr>
+
+                            {% endfor %}
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            {% else %}
+
+                <div class="text-center py-4">
+                    <i class="fa-solid fa-inbox fa-2x text-muted mb-3"></i>
+
+                    <p class="text-muted mb-0">
+                        No submissions have been recorded for this task.
+                    </p>
+                </div>
+
+            {% endif %}
+
+        </div>
+
+        <!-- Task Comments -->
+        <div class="dashboard-panel mt-4">
+
+            <div class="dashboard-section-title">
+                <div>
+                    <h2>Task Discussion</h2>
+                    <p>
+                        Comments and updates from the project team.
+                    </p>
+                </div>
+            </div>
+
+            {% if comments %}
+
+                <div class="task-comments-list">
+
+                    {% for comment in comments %}
+
+                        <div class="task-comment-card">
+
+                            <div class="d-flex align-items-center gap-3 mb-2">
+
+                                <div class="task-comment-avatar">
+                                    {{ comment.user.username|first|upper }}
+                                </div>
+
+                                <div>
+                                    <strong>
+                                        {{ comment.user.get_full_name|default:comment.user.username }}
+                                    </strong>
+
+                                    <small class="text-muted d-block">
+                                        {{ comment.created_at|date:"d M Y, h:i A" }}
+                                    </small>
+                                </div>
+
+                            </div>
+
+                            <div class="task-description">
+                                {{ comment.comment }}
+                            </div>
+
+                        </div>
+
+                    {% endfor %}
+
+                </div>
+
+            {% else %}
+
+                <p class="text-muted">
+                    No comments yet. Start a discussion below.
+                </p>
+
+            {% endif %}
+
+            <!-- Add Comment -->
+            <form
+                method="post"
+                action="{% url 'add_task_comment' task.id %}"
+                class="mt-4"
+            >
+                {% csrf_token %}
+
+                <div class="mb-3">
+
+                    <label
+                        for="taskComment"
+                        class="form-label fw-semibold"
+                    >
+                        Add Comment
+                    </label>
+
+                    <textarea
+                        name="comment"
+                        id="taskComment"
+                        class="form-control"
+                        rows="4"
+                        maxlength="5000"
+                        placeholder="Write a task update or discussion message..."
+                        required
+                    ></textarea>
+
+                </div>
+
+                <div class="d-flex justify-content-end">
+
+                    <button
+                        type="submit"
+                        class="btn btn-primary"
+                    >
+                        <i class="fa-solid fa-paper-plane"></i>
+                        Post Comment
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+</div>
+
+<style>
+    .task-description {
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+        line-height: 1.7;
+    }
+
+    .task-info-card {
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 22px;
+        height: 100%;
+    }
+
+    .task-feedback-card {
+        border: 1px solid #bfdbfe;
+        background: #f8fbff;
+        border-radius: 12px;
+        padding: 20px;
+    }
+
+    .task-action-area {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .task-history-table th {
+        white-space: nowrap;
+    }
+
+    .task-history-table td {
+        vertical-align: top;
+    }
+
+    .task-history-text {
+        max-width: 260px;
+        max-height: 160px;
+        overflow-y: auto;
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+        font-size: 14px;
+        line-height: 1.6;
+    }
+
+    .task-comments-list {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+    }
+
+    .task-comment-card {
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 18px;
+    }
+
+    .task-comment-avatar {
+        width: 38px;
+        height: 38px;
+        min-width: 38px;
+        border-radius: 50%;
+        background: #0d6efd;
+        color: #ffffff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+    }
+
+    @media (max-width: 768px) {
+        .task-history-table {
+            min-width: 1000px;
+        }
+
+        .task-info-card,
+        .task-feedback-card,
+        .task-comment-card {
+            padding: 16px;
+        }
+    }
+</style>
+{% endblock %}

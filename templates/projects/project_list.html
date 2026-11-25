@@ -1,0 +1,268 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container-fluid py-4">
+
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <div>
+            <h1 class="fw-bold mb-1">Projects</h1>
+
+            <p class="text-muted mb-0">
+                Manage and track your team's projects.
+            </p>
+        </div>
+
+        
+{% if request.user.is_superuser or request.user.is_staff or request.user.profile.role|lower == "admin" or request.user.profile.role|lower == "manager" %}
+    <a href="{% url 'project_create' %}" class="btn btn-primary px-4">
+        <i class="fas fa-plus me-2"></i>
+        New Project
+    </a>
+{% endif %}
+
+
+    </div>
+
+
+    <!-- Project Statistics -->
+    <div class="row g-4 mb-4">
+
+        <div class="col-md-4">
+
+            <div class="card border-0 shadow-sm h-100">
+
+                <div class="card-body">
+
+                    <div class="d-flex justify-content-between">
+
+                        <div>
+                            <p class="text-muted mb-1">
+                                Total Projects
+                            </p>
+
+                            <h2 class="fw-bold mb-0">
+                                {{ projects|length }}
+                            </h2>
+                        </div>
+
+                        <div class="bg-primary bg-opacity-10
+                                    text-primary rounded-3
+                                    p-3">
+
+                            <i class="fas fa-folder fa-lg"></i>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- Project List -->
+
+    <div class="card border-0 shadow-sm">
+
+        <div class="card-body p-0">
+
+            {% if projects %}
+
+                <div class="table-responsive">
+
+                    <table class="table align-middle mb-0">
+
+                        <thead class="table-light">
+
+                            <tr>
+
+                                <th class="px-4">
+                                    Project
+                                </th>
+
+                                <th>
+                                    Owner
+                                </th>
+
+                                <th>
+                                    Status
+                                </th>
+
+                                <th>
+                                    Deadline
+                                </th>
+
+                                <th class="text-end px-4">
+                                    Action
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+                        <tbody>
+
+                            {% for project in projects %}
+
+                                <tr>
+
+                                    <td class="px-4">
+
+                                        <div class="d-flex
+                                                    align-items-center">
+
+                                            <div class="rounded-3
+                                                        bg-primary
+                                                        bg-opacity-10
+                                                        text-primary
+                                                        p-2 me-3">
+
+                                                <i class="fas fa-folder"></i>
+
+                                            </div>
+
+                                            <div>
+
+                                                <a href="{% url 'project_detail' project.id %}"
+                                                   class="fw-semibold text-decoration-none">
+
+                                                    {{ project.name }}
+
+                                                </a>
+
+                                                <small class="d-block text-muted">
+
+                                                    {{ project.description|truncatechars:60 }}
+
+                                                </small>
+
+                                            </div>
+
+                                        </div>
+
+                                    </td>
+
+
+                                    <td>
+
+                                        {{ project.owner.username }}
+
+                                    </td>
+
+
+                                    <td>
+
+                                        {% if project.status == "planning" %}
+
+                                            <span class="badge bg-secondary">
+                                                Planning
+                                            </span>
+
+                                        {% elif project.status == "in_progress" %}
+
+                                            <span class="badge bg-primary">
+                                                In Progress
+                                            </span>
+
+                                        {% elif project.status == "completed" %}
+
+                                            <span class="badge bg-success">
+                                                Completed
+                                            </span>
+
+                                        {% elif project.status == "on_hold" %}
+
+                                            <span class="badge bg-warning text-dark">
+                                                On Hold
+                                            </span>
+
+                                        {% endif %}
+
+                                    </td>
+
+
+                                    <td>
+
+                                        {% if project.deadline %}
+
+                                            {{ project.deadline|date:"d M Y" }}
+
+                                        {% else %}
+
+                                            <span class="text-muted">
+                                                No deadline
+                                            </span>
+
+                                        {% endif %}
+
+                                    </td>
+
+
+                                    <td class="text-end px-4">
+
+                                        <a href="{% url 'project_detail' project.id %}"
+                                           class="btn btn-sm btn-outline-primary">
+
+                                            View
+
+                                        </a>
+
+                                    </td>
+
+                                </tr>
+
+                            {% endfor %}
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            {% else %}
+
+                <!-- Empty State -->
+
+                <div class="text-center py-5 px-3">
+
+                    <div class="mb-3">
+
+                        <i class="fas fa-folder-open fa-3x text-muted"></i>
+
+                    </div>
+
+                    <h4 class="fw-semibold">
+                        No projects yet
+                    </h4>
+
+                    <p class="text-muted">
+                        Create your first project to start
+                        managing your team's work.
+                    </p>
+
+                    <a href="{% url 'project_create' %}"
+                       class="btn btn-primary">
+
+                        <i class="fas fa-plus me-2"></i>
+                        Create Your First Project
+
+                    </a>
+
+                </div>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

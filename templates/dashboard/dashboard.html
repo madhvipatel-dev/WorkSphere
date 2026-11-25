@@ -1,0 +1,1360 @@
+{% extends "base.html" %}
+
+
+{% block title %}
+    Dashboard | WorkSphere
+{% endblock %}
+
+
+{% block content %}
+
+<div class="page-content">
+
+<div class="dashboard-page
+    {% if role == 'Admin' %}dashboard-admin
+    {% elif role == 'Manager' %}dashboard-manager
+    {% else %}dashboard-employee{% endif %}">
+
+
+        <!-- =====================================================
+             ADMIN DASHBOARD
+             ===================================================== -->
+
+        {% if role == "Admin" %}
+
+        <!-- Header -->
+
+        <div class="dashboard-header">
+
+            <div>
+
+                <div class="dashboard-eyebrow">
+                    Admin Workspace
+                </div>
+
+                <h1>
+                    Welcome back, {{ request.user.username }} 👋
+                </h1>
+
+                <p>
+                    Monitor and manage your entire WorkSphere workspace.
+                </p>
+
+            </div>
+
+
+            <a
+                href="{% url 'project_create' %}"
+                class="dashboard-primary-button"
+            >
+                <i class="fa-solid fa-plus"></i>
+                New Project
+            </a>
+
+        </div>
+
+
+        <!-- System Overview -->
+
+        <div class="dashboard-section-title">
+
+            <h2>
+                System Overview
+            </h2>
+
+            <p>
+                Monitor your entire WorkSphere workspace.
+            </p>
+
+        </div>
+
+
+        <!-- Statistics -->
+
+        <div class="dashboard-stat-grid">
+
+
+            <!-- Total Projects -->
+
+            <a
+                href="{% url 'project_list' %}"
+                class="dashboard-stat-card"
+            >
+
+                <div class="stat-icon purple">
+                    <i class="fa-solid fa-folder"></i>
+                </div>
+
+                <div class="stat-content">
+
+                    <span>
+                        Total Projects
+                    </span>
+
+                    <strong>
+                        {{ total_projects }}
+                    </strong>
+
+                    <small>
+                        View all projects
+                    </small>
+
+                </div>
+
+                <i class="fa-solid fa-chevron-right stat-arrow"></i>
+
+            </a>
+
+
+            <!-- Total Tasks -->
+
+            <a
+                href="{% url 'task_list' %}"
+                class="dashboard-stat-card"
+            >
+
+                <div class="stat-icon blue">
+                    <i class="fa-solid fa-list-check"></i>
+                </div>
+
+                <div class="stat-content">
+
+                    <span>
+                        Total Tasks
+                    </span>
+
+                    <strong>
+                        {{ total_tasks }}
+                    </strong>
+
+                    <small>
+                        Manage tasks
+                    </small>
+
+                </div>
+
+                <i class="fa-solid fa-chevron-right stat-arrow"></i>
+
+            </a>
+
+
+            <!-- Total Meetings -->
+
+            <a
+                href="{% url 'meeting_list' %}"
+                class="dashboard-stat-card"
+            >
+
+                <div class="stat-icon green">
+                    <i class="fa-regular fa-calendar"></i>
+                </div>
+
+                <div class="stat-content">
+
+                    <span>
+                        Total Meetings
+                    </span>
+
+                    <strong>
+                        {{ total_meetings }}
+                    </strong>
+
+                    <small>
+                        View meetings
+                    </small>
+
+                </div>
+
+                <i class="fa-solid fa-chevron-right stat-arrow"></i>
+
+            </a>
+
+
+            <!-- Pending Tasks -->
+
+            <a
+                href="{% url 'task_list' %}?status=todo"
+                class="dashboard-stat-card"
+            >
+
+                <div class="stat-icon orange">
+                    <i class="fa-solid fa-clock"></i>
+                </div>
+
+                <div class="stat-content">
+
+                    <span>
+                        Pending Tasks
+                    </span>
+
+                    <strong>
+                        {{ pending_tasks }}
+                    </strong>
+
+                    <small>
+                        Need attention
+                    </small>
+
+                </div>
+
+                <i class="fa-solid fa-chevron-right stat-arrow"></i>
+
+            </a>
+
+
+        </div>
+
+
+        <!-- Dashboard Content -->
+
+        <div class="dashboard-content-grid">
+
+
+            <!-- Recent Projects -->
+
+            <div class="dashboard-panel">
+
+                <div class="panel-header">
+
+                    <div>
+
+                        <h3>
+                            Recent Projects
+                        </h3>
+
+                        <p>
+                            Latest projects in the workspace
+                        </p>
+
+                    </div>
+
+                    <a href="{% url 'project_list' %}">
+                        View all
+                    </a>
+
+                </div>
+
+
+                <div class="project-list">
+
+                    {% for project in recent_projects %}
+
+                    <a
+                        href="{% url 'project_detail' project.id %}"
+                        class="project-row"
+                    >
+
+                        <div class="project-row-icon">
+                            <i class="fa-solid fa-folder"></i>
+                        </div>
+
+                        <div class="project-row-info">
+
+                            <strong>
+                                {{ project.name }}
+                            </strong>
+
+                            <span>
+                                {{ project.get_status_display }}
+                            </span>
+
+                        </div>
+
+                        <i class="fa-solid fa-chevron-right"></i>
+
+                    </a>
+
+
+                    {% empty %}
+
+                    <div class="dashboard-empty">
+
+                        <i class="fa-solid fa-folder-open fa-2x mb-3"></i>
+
+                        <div>
+                            No projects available.
+                        </div>
+
+                    </div>
+
+                    {% endfor %}
+
+                </div>
+
+            </div>
+
+
+            <!-- Quick Access -->
+
+            <div class="dashboard-panel">
+
+                <div class="panel-header">
+
+                    <div>
+
+                        <h3>
+                            Quick Access
+                        </h3>
+
+                        <p>
+                            Frequently used WorkSphere modules
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="quick-links">
+
+
+                    <!-- Projects -->
+
+                    <a href="{% url 'project_list' %}">
+
+                        <i class="fa-solid fa-folder"></i>
+
+                        <span>
+                            Projects
+                        </span>
+
+                        <i class="fa-solid fa-chevron-right"></i>
+
+                    </a>
+
+
+                    <!-- Tasks -->
+
+                    <a href="{% url 'task_list' %}">
+
+                        <i class="fa-solid fa-list-check"></i>
+
+                        <span>
+                            Tasks
+                        </span>
+
+                        <i class="fa-solid fa-chevron-right"></i>
+
+                    </a>
+
+
+                    <!-- Meetings -->
+
+                    <a href="{% url 'meeting_list' %}">
+
+                        <i class="fa-regular fa-calendar"></i>
+
+                        <span>
+                            Meetings
+                        </span>
+
+                        <i class="fa-solid fa-chevron-right"></i>
+
+                    </a>
+
+
+                    <!-- Files -->
+
+                    <a href="{% url 'file_list' %}">
+
+                        <i class="fa-solid fa-folder-open"></i>
+
+                        <span>
+                            Files
+                        </span>
+
+                        <i class="fa-solid fa-chevron-right"></i>
+
+                    </a>
+
+
+                    <!-- Manage Users -->
+
+                    <a href="{% url 'user_management' %}">
+
+                        <i class="fa-solid fa-users-gear"></i>
+
+                        <span>
+                            Manage Users
+                        </span>
+
+                        <i class="fa-solid fa-chevron-right"></i>
+
+                    </a>
+
+
+                    <!-- Manage Departments -->
+
+                    <a href="{% url 'department_list' %}">
+
+                        <i class="fa-solid fa-building"></i>
+
+                        <span>
+                            Manage Departments
+                        </span>
+
+                        <i class="fa-solid fa-chevron-right"></i>
+
+                    </a>
+
+
+                    <!-- Manage Employees -->
+
+                    <a href="{% url 'employee_management' %}">
+
+                        <i class="fa-solid fa-user-tie"></i>
+
+                        <span>
+
+                            <strong>
+                                Manage Employees
+                            </strong>
+
+                            <small>
+                                Employee profiles and departments
+                            </small>
+
+                        </span>
+
+                        <i class="fa-solid fa-chevron-right"></i>
+
+                    </a>
+
+
+                    <!-- Roles & Permissions -->
+
+                    <a href="{% url 'role_permissions' %}">
+
+                        <i class="fa-solid fa-shield-halved"></i>
+
+                        <span>
+
+                            <strong>
+                                Roles & Permissions
+                            </strong>
+
+                            <small>
+                                Manage access levels
+                            </small>
+
+                        </span>
+
+                        <i class="fa-solid fa-chevron-right"></i>
+
+                    </a>
+
+
+                </div>
+
+            </div>
+
+
+        </div>
+
+
+        <!-- =====================================================
+             ADMIN RECENT NOTIFICATIONS
+             ===================================================== -->
+
+        <div
+            class="dashboard-panel"
+            style="margin-top: 24px;"
+        >
+
+            <div class="panel-header">
+
+                <div>
+
+                    <h3>
+
+                        <i
+                            class="fa-solid fa-bell"
+                            style="color:#4f46e5; margin-right:8px;"
+                        ></i>
+
+                        Recent Notifications
+
+                    </h3>
+
+                    <p>
+                        Latest activity and alerts from your workspace
+                    </p>
+
+                </div>
+
+
+                <a href="{% url 'notification_list' %}">
+                    View all
+                </a>
+
+            </div>
+
+
+            <div>
+
+                {% for notification in recent_notifications %}
+
+               <a
+    href="{% if notification.related_task_id %}{% url 'task_detail' notification.related_task_id %}{% else %}{% url 'notification_list' %}{% endif %}"
+    style="
+        display: flex;
+        align-items: flex-start;
+        gap: 14px;
+        padding: 16px 18px;
+        text-decoration: none;
+        color: inherit;
+        border-bottom: 1px solid #eef0f4;
+    "
+    {% if not notification.is_read %}
+        class="notification-unread"
+    {% endif %}
+>
+
+
+                    <!-- Notification Icon -->
+
+                    <div
+                        style="
+                            width:42px;
+                            height:42px;
+                            min-width:42px;
+                            border-radius:10px;
+                            display:flex;
+                            align-items:center;
+                            justify-content:center;
+                            background:#eef2ff;
+                            color:#4f46e5;
+                        "
+                    >
+
+                        <i class="fa-solid fa-bell"></i>
+
+                    </div>
+
+
+                    <!-- Notification Content -->
+
+                    <div
+                        style="
+                            flex:1;
+                            min-width:0;
+                        "
+                    >
+
+                        <div
+                            style="
+                                display:flex;
+                                align-items:center;
+                                gap:8px;
+                                flex-wrap:wrap;
+                            "
+                        >
+
+                            <strong>
+                                {{ notification.title }}
+                            </strong>
+
+
+                            {% if not notification.is_read %}
+
+                            <span
+                                style="
+                                    font-size:11px;
+                                    padding:3px 8px;
+                                    border-radius:20px;
+                                    background:#e0e7ff;
+                                    color:#4338ca;
+                                    font-weight:600;
+                                "
+                            >
+                                New
+                            </span>
+
+                            {% endif %}
+
+                        </div>
+
+
+                        <p
+                            style="
+                                margin:5px 0;
+                                color:#667085;
+                                font-size:13px;
+                                line-height:1.5;
+                            "
+                        >
+                            {{ notification.message }}
+                        </p>
+
+
+                        <small
+                            style="
+                                color:#98a2b3;
+                            "
+                        >
+                            {{ notification.created_at|date:"d M Y, h:i A" }}
+                        </small>
+
+                    </div>
+
+
+                    <!-- Arrow -->
+
+                    <i
+                        class="fa-solid fa-chevron-right"
+                        style="
+                            color:#98a2b3;
+                            margin-top:10px;
+                        "
+                    ></i>
+
+
+                </a>
+
+
+                {% empty %}
+
+
+                <div
+                    class="dashboard-empty"
+                    style="
+                        padding:35px 20px;
+                        text-align:center;
+                    "
+                >
+
+                    <i
+                        class="fa-regular fa-bell-slash fa-2x mb-3"
+                    ></i>
+
+                    <div>
+                        No recent notifications.
+                    </div>
+
+                    <small
+                        style="
+                            display:block;
+                            margin-top:6px;
+                            color:#98a2b3;
+                        "
+                    >
+                        New task and work activity notifications
+                        will appear here.
+                    </small>
+
+                </div>
+
+
+                {% endfor %}
+
+            </div>
+
+        </div>
+
+
+        <!-- =====================================================
+             MANAGER DASHBOARD
+             ===================================================== -->
+
+        {% elif role == "Manager" %}
+
+
+        <!-- Header -->
+
+        <div class="dashboard-header">
+
+            <div>
+
+                <div class="dashboard-eyebrow">
+                    Manager Workspace
+                </div>
+
+                <h1>
+                    Welcome back, {{ request.user.username }} 👋
+                </h1>
+
+                <p>
+                    Manage your projects, team and assigned work.
+                </p>
+
+            </div>
+
+
+            <a
+                href="{% url 'project_create' %}"
+                class="dashboard-primary-button"
+            >
+
+                <i class="fa-solid fa-plus"></i>
+
+                New Project
+
+            </a>
+
+        </div>
+
+
+        <!-- Manager Overview -->
+
+        <div class="dashboard-section-title">
+
+            <h2>
+                Manager Overview
+            </h2>
+
+            <p>
+                Track projects, tasks and upcoming meetings.
+            </p>
+
+        </div>
+
+
+        <!-- Manager Statistics -->
+
+        <div class="dashboard-stat-grid">
+
+
+            <!-- Projects -->
+
+            <a
+                href="{% url 'project_list' %}"
+                class="dashboard-stat-card"
+            >
+
+                <div class="stat-icon purple">
+
+                    <i class="fa-solid fa-folder"></i>
+
+                </div>
+
+                <div class="stat-content">
+
+                    <span>
+                        My Projects
+                    </span>
+
+                    <strong>
+                        {{ total_projects }}
+                    </strong>
+
+                    <small>
+                        Projects you manage
+                    </small>
+
+                </div>
+
+                <i class="fa-solid fa-chevron-right stat-arrow"></i>
+
+            </a>
+
+
+            <!-- Tasks -->
+
+            <a
+                href="{% url 'task_list' %}"
+                class="dashboard-stat-card"
+            >
+
+                <div class="stat-icon blue">
+
+                    <i class="fa-solid fa-list-check"></i>
+
+                </div>
+
+                <div class="stat-content">
+
+                    <span>
+                        Total Tasks
+                    </span>
+
+                    <strong>
+                        {{ total_tasks }}
+                    </strong>
+
+                    <small>
+                        Team tasks
+                    </small>
+
+                </div>
+
+                <i class="fa-solid fa-chevron-right stat-arrow"></i>
+
+            </a>
+
+
+            <!-- Pending -->
+
+            <a
+                href="{% url 'task_list' %}?status=todo"
+                class="dashboard-stat-card"
+            >
+
+                <div class="stat-icon orange">
+
+                    <i class="fa-solid fa-clock"></i>
+
+                </div>
+
+                <div class="stat-content">
+
+                    <span>
+                        Pending Tasks
+                    </span>
+
+                    <strong>
+                        {{ pending_tasks }}
+                    </strong>
+
+                    <small>
+                        Work in progress
+                    </small>
+
+                </div>
+
+                <i class="fa-solid fa-chevron-right stat-arrow"></i>
+
+            </a>
+
+
+            <!-- Meetings -->
+
+            <a
+                href="{% url 'meeting_list' %}"
+                class="dashboard-stat-card"
+            >
+
+                <div class="stat-icon green">
+
+                    <i class="fa-regular fa-calendar"></i>
+
+                </div>
+
+                <div class="stat-content">
+
+                    <span>
+                        Upcoming Meetings
+                    </span>
+
+                    <strong>
+                        {{ upcoming_meetings }}
+                    </strong>
+
+                    <small>
+                        Scheduled meetings
+                    </small>
+
+                </div>
+
+                <i class="fa-solid fa-chevron-right stat-arrow"></i>
+
+            </a>
+
+
+        </div>
+
+
+        <!-- Manager Content -->
+
+        <div class="dashboard-content-grid">
+
+
+            <!-- Manager Projects -->
+
+            <div class="dashboard-panel">
+
+                <div class="panel-header">
+
+                    <div>
+
+                        <h3>
+                            My Projects
+                        </h3>
+
+                        <p>
+                            Projects you're managing
+                        </p>
+
+                    </div>
+
+                    <a href="{% url 'project_list' %}">
+                        View all
+                    </a>
+
+                </div>
+
+
+                <div class="project-list">
+
+                    {% for project in recent_projects %}
+
+                    <a
+                        href="{% url 'project_detail' project.id %}"
+                        class="project-row"
+                    >
+
+                        <div class="project-row-icon">
+
+                            <i class="fa-solid fa-folder"></i>
+
+                        </div>
+
+                        <div class="project-row-info">
+
+                            <strong>
+                                {{ project.name }}
+                            </strong>
+
+                            <span>
+                                {{ project.get_status_display }}
+                            </span>
+
+                        </div>
+
+                        <i class="fa-solid fa-chevron-right"></i>
+
+                    </a>
+
+
+                    {% empty %}
+
+                    <div class="dashboard-empty">
+                        No projects available.
+                    </div>
+
+                    {% endfor %}
+
+                </div>
+
+            </div>
+
+
+            <!-- Manager Quick Actions -->
+
+            <div class="dashboard-panel">
+
+                <div class="panel-header">
+
+                    <div>
+
+                        <h3>
+                            Quick Actions
+                        </h3>
+
+                        <p>
+                            Common manager activities
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="quick-links">
+
+
+                    <a href="{% url 'project_create' %}">
+
+                        <i class="fa-solid fa-folder-plus"></i>
+
+                        <span>
+                            Create Project
+                        </span>
+
+                        <i class="fa-solid fa-chevron-right"></i>
+
+                    </a>
+
+
+                    <a href="{% url 'task_create' %}">
+
+                        <i class="fa-solid fa-plus"></i>
+
+                        <span>
+                            Create Task
+                        </span>
+
+                        <i class="fa-solid fa-chevron-right"></i>
+
+                    </a>
+
+
+                    <a href="{% url 'meeting_create' %}">
+
+                        <i class="fa-regular fa-calendar-plus"></i>
+
+                        <span>
+                            Schedule Meeting
+                        </span>
+
+                        <i class="fa-solid fa-chevron-right"></i>
+
+                    </a>
+
+
+                </div>
+
+            </div>
+
+
+        </div>
+
+
+        <!-- =====================================================
+             EMPLOYEE DASHBOARD
+             ===================================================== -->
+
+        {% else %}
+
+
+        <!-- Employee Header -->
+
+        <div class="dashboard-header">
+
+            <div>
+
+                <div class="dashboard-eyebrow">
+                    Employee Workspace
+                </div>
+
+                <h1>
+                    Welcome back, {{ request.user.username }} 👋
+                </h1>
+
+                <p>
+                    Here's a quick overview of your work in WorkSphere.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- Employee Overview -->
+
+        <div class="dashboard-section-title">
+
+            <h2>
+                My Work
+            </h2>
+
+            <p>
+                Focus on your assigned work and upcoming activities.
+            </p>
+
+        </div>
+
+
+        <!-- Employee Statistics -->
+
+        <div class="dashboard-stat-grid">
+
+
+            <!-- My Tasks -->
+
+            <a
+                href="{% url 'task_list' %}"
+                class="dashboard-stat-card"
+            >
+
+                <div class="stat-icon blue">
+
+                    <i class="fa-solid fa-list-check"></i>
+
+                </div>
+
+                <div class="stat-content">
+
+                    <span>
+                        My Tasks
+                    </span>
+
+                    <strong>
+                        {{ total_tasks }}
+                    </strong>
+
+                    <small>
+                        Assigned to you
+                    </small>
+
+                </div>
+
+                <i class="fa-solid fa-chevron-right stat-arrow"></i>
+
+            </a>
+
+
+            <!-- Pending -->
+
+            <a
+                href="{% url 'task_list' %}?status=todo"
+                class="dashboard-stat-card"
+            >
+
+                <div class="stat-icon orange">
+
+                    <i class="fa-solid fa-clock"></i>
+
+                </div>
+
+                <div class="stat-content">
+
+                    <span>
+                        Pending
+                    </span>
+
+                    <strong>
+                        {{ pending_tasks }}
+                    </strong>
+
+                    <small>
+                        Work in progress
+                    </small>
+
+                </div>
+
+                <i class="fa-solid fa-chevron-right stat-arrow"></i>
+
+            </a>
+
+
+            <!-- Completed -->
+
+            <div class="dashboard-stat-card">
+
+                <div class="stat-icon green">
+
+                    <i class="fa-solid fa-circle-check"></i>
+
+                </div>
+
+                <div class="stat-content">
+
+                    <span>
+                        Completed
+                    </span>
+
+                    <strong>
+                        {{ completed_tasks }}
+                    </strong>
+
+                    <small>
+                        Tasks completed
+                    </small>
+
+                </div>
+
+            </div>
+
+
+            <!-- Meetings -->
+
+            <a
+                href="{% url 'meeting_list' %}"
+                class="dashboard-stat-card"
+            >
+
+                <div class="stat-icon purple">
+
+                    <i class="fa-regular fa-calendar"></i>
+
+                </div>
+
+                <div class="stat-content">
+
+                    <span>
+                        Meetings
+                    </span>
+
+                    <strong>
+                        {{ upcoming_meetings }}
+                    </strong>
+
+                    <small>
+                        Upcoming meetings
+                    </small>
+
+                </div>
+
+                <i class="fa-solid fa-chevron-right stat-arrow"></i>
+
+            </a>
+
+
+        </div>
+
+
+        <!-- Employee Content -->
+
+        <div class="dashboard-content-grid">
+
+
+            <!-- Employee Projects -->
+
+            <div class="dashboard-panel">
+
+                <div class="panel-header">
+
+                    <div>
+
+                        <h3>
+                            My Projects
+                        </h3>
+
+                        <p>
+                            Projects you're currently involved in
+                        </p>
+
+                    </div>
+
+                    <a href="{% url 'project_list' %}">
+                        View all
+                    </a>
+
+                </div>
+
+
+                <div class="project-list">
+
+                    {% for project in recent_projects %}
+
+                    <a
+                        href="{% url 'project_detail' project.id %}"
+                        class="project-row"
+                    >
+
+                        <div class="project-row-icon">
+
+                            <i class="fa-solid fa-folder"></i>
+
+                        </div>
+
+                        <div class="project-row-info">
+
+                            <strong>
+                                {{ project.name }}
+                            </strong>
+
+                            <span>
+                                {{ project.get_status_display }}
+                            </span>
+
+                        </div>
+
+                        <i class="fa-solid fa-chevron-right"></i>
+
+                    </a>
+
+
+                    {% empty %}
+
+                    <div class="dashboard-empty">
+                        No projects available.
+                    </div>
+
+                    {% endfor %}
+
+                </div>
+
+            </div>
+
+
+            <!-- Employee Modules -->
+
+            <div class="dashboard-panel">
+
+                <div class="panel-header">
+
+                    <div>
+
+                        <h3>
+                            WorkSphere Modules
+                        </h3>
+
+                        <p>
+                            Jump directly to your workspace
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="quick-links">
+
+
+                    <!-- My Tasks -->
+
+                    <a href="{% url 'task_list' %}">
+
+                        <i class="fa-solid fa-list-check"></i>
+
+                        <span>
+                            My Tasks
+                        </span>
+
+                        <i class="fa-solid fa-chevron-right"></i>
+
+                    </a>
+
+
+                    <!-- Meetings -->
+
+                    <a href="{% url 'meeting_list' %}">
+
+                        <i class="fa-regular fa-calendar"></i>
+
+                        <span>
+                            Meetings
+                        </span>
+
+                        <i class="fa-solid fa-chevron-right"></i>
+
+                    </a>
+
+
+                    <!-- Project Files -->
+
+                    <a href="{% url 'file_list' %}">
+
+                        <i class="fa-solid fa-folder-open"></i>
+
+                        <span>
+                            Project Files
+                        </span>
+
+                        <i class="fa-solid fa-chevron-right"></i>
+
+                    </a>
+
+
+                    <!-- Projects -->
+
+                    <a href="{% url 'project_list' %}">
+
+                        <i class="fa-solid fa-folder"></i>
+
+                        <span>
+                            Projects
+                        </span>
+
+                        <i class="fa-solid fa-chevron-right"></i>
+
+                    </a>
+
+
+                </div>
+
+            </div>
+
+
+        </div>
+
+
+        {% endif %}
+
+
+    </div>
+
+</div>
+
+{% endblock %}

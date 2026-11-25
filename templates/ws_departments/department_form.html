@@ -1,0 +1,413 @@
+{% extends "base.html" %}
+
+{% block title %}
+    {% if department %}
+        Edit Department | WorkSphere
+    {% else %}
+        Add Department | WorkSphere
+    {% endif %}
+{% endblock %}
+
+
+{% block content %}
+
+<div class="container-fluid py-4">
+
+    <!-- Page Header -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+
+        <div>
+            <div class="d-flex align-items-center gap-2 mb-2">
+
+                <a
+                    href="{% url 'department_list' %}"
+                    class="btn btn-light btn-sm"
+                    title="Back to Departments"
+                >
+                    <i class="fas fa-arrow-left"></i>
+                </a>
+
+                <span class="text-muted">
+                    Departments
+                </span>
+
+            </div>
+
+            <h2 class="fw-bold mb-1">
+
+                {% if department %}
+                    <i class="fas fa-pen-to-square me-2"></i>
+                    Edit Department
+                {% else %}
+                    <i class="fas fa-building-circle-plus me-2"></i>
+                    Add Department
+                {% endif %}
+
+            </h2>
+
+            <p class="text-muted mb-0">
+
+                {% if department %}
+                    Update department information and management details.
+                {% else %}
+                    Create a new department for your organization.
+                {% endif %}
+
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <div class="row g-4">
+
+        <!-- Main Form -->
+        <div class="col-xl-8">
+
+            <div class="card border-0 shadow-sm">
+
+                <div class="card-header bg-white border-0 py-3">
+
+                    <h5 class="fw-bold mb-1">
+                        Department Information
+                    </h5>
+
+                    <small class="text-muted">
+                        Enter the basic information for this department.
+                    </small>
+
+                </div>
+
+
+                <div class="card-body">
+
+                    <form method="post">
+
+                        {% csrf_token %}
+
+
+                        <!-- Department Name -->
+                        <div class="mb-4">
+
+                            <label
+                                for="name"
+                                class="form-label fw-semibold"
+                            >
+                                Department Name
+                                <span class="text-danger">*</span>
+                            </label>
+
+                            <input
+                                type="text"
+                                id="name"
+                                name="name"
+                                class="form-control"
+                                placeholder="e.g. Information Technology"
+                                value="{% if form_data %}{{ form_data.name }}{% elif department %}{{ department.name }}{% endif %}"
+                                maxlength="100"
+                                required
+                            >
+
+                            <div class="form-text">
+                                Enter a unique name for the department.
+                            </div>
+
+                        </div>
+
+
+                        <!-- Department Code -->
+                        <div class="mb-4">
+
+                            <label
+                                for="code"
+                                class="form-label fw-semibold"
+                            >
+                                Department Code
+                                <span class="text-danger">*</span>
+                            </label>
+
+                            <input
+                                type="text"
+                                id="code"
+                                name="code"
+                                class="form-control text-uppercase"
+                                placeholder="e.g. IT"
+                                value="{% if form_data %}{{ form_data.code }}{% elif department %}{{ department.code }}{% endif %}"
+                                maxlength="20"
+                                required
+                            >
+
+                            <div class="form-text">
+                                Use a short unique code such as IT, HR, FIN or MKT.
+                            </div>
+
+                        </div>
+
+
+                        <!-- Manager -->
+                        <div class="mb-4">
+
+                            <label
+                                for="manager"
+                                class="form-label fw-semibold"
+                            >
+                                Department Manager
+                            </label>
+
+                            <select
+                                id="manager"
+                                name="manager"
+                                class="form-select"
+                            >
+
+                                <option value="">
+                                    No manager assigned
+                                </option>
+
+                                {% for manager in managers %}
+
+                                    <option
+                                        value="{{ manager.id }}"
+                                        {% if form_data and form_data.manager == manager.id|stringformat:"s" %}
+                                            selected
+                                        {% elif department and department.manager_id == manager.id %}
+                                            selected
+                                        {% endif %}
+                                    >
+                                        {{ manager.username }}
+                                        {% if manager.email %}
+                                            — {{ manager.email }}
+                                        {% endif %}
+                                    </option>
+
+                                {% endfor %}
+
+                            </select>
+
+                            <div class="form-text">
+                                Select the user responsible for managing this department.
+                            </div>
+
+                        </div>
+
+
+                        <!-- Description -->
+                        <div class="mb-4">
+
+                            <label
+                                for="description"
+                                class="form-label fw-semibold"
+                            >
+                                Description
+                            </label>
+
+                            <textarea
+                                id="description"
+                                name="description"
+                                class="form-control"
+                                rows="5"
+                                maxlength="500"
+                                placeholder="Describe the department's responsibilities and purpose..."
+                            >{% if form_data %}{{ form_data.description }}{% elif department %}{{ department.description }}{% endif %}</textarea>
+
+                            <div class="form-text">
+                                Add a short description of the department.
+                            </div>
+
+                        </div>
+
+
+                        <!-- Active Status -->
+                        <div class="mb-4">
+
+                            <div class="form-check form-switch">
+
+                                <input
+                                    class="form-check-input"
+                                    type="checkbox"
+                                    role="switch"
+                                    id="is_active"
+                                    name="is_active"
+                                    {% if form_data %}
+                                        {% if form_data.is_active %}checked{% endif %}
+                                    {% elif not department or department.is_active %}
+                                        checked
+                                    {% endif %}
+                                >
+
+                                <label
+                                    class="form-check-label fw-semibold"
+                                    for="is_active"
+                                >
+                                    Active Department
+                                </label>
+
+                            </div>
+
+                            <div class="form-text ms-4">
+                                Inactive departments remain in the system but are not currently active.
+                            </div>
+
+                        </div>
+
+
+                        <!-- Actions -->
+                        <div class="d-flex flex-wrap gap-2 pt-3 border-top">
+
+                            <a
+                                href="{% url 'department_list' %}"
+                                class="btn btn-light"
+                            >
+                                <i class="fas fa-xmark me-2"></i>
+                                Cancel
+                            </a>
+
+                            <button
+                                type="submit"
+                                class="btn btn-primary"
+                            >
+
+                                {% if department %}
+                                    <i class="fas fa-save me-2"></i>
+                                    Update Department
+                                {% else %}
+                                    <i class="fas fa-plus me-2"></i>
+                                    Create Department
+                                {% endif %}
+
+                            </button>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Information Panel -->
+        <div class="col-xl-4">
+
+            <div class="card border-0 shadow-sm mb-4">
+
+                <div class="card-body">
+
+                    <div class="d-flex align-items-center mb-3">
+
+                        <div
+                            class="rounded-circle bg-primary bg-opacity-10 d-flex align-items-center justify-content-center me-3"
+                            style="width: 48px; height: 48px;"
+                        >
+                            <i class="fas fa-building text-primary"></i>
+                        </div>
+
+                        <div>
+
+                            <h5 class="fw-bold mb-1">
+                                Department Setup
+                            </h5>
+
+                            <small class="text-muted">
+                                Organization structure
+                            </small>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="border-top pt-3">
+
+                        <div class="d-flex mb-3">
+
+                            <i class="fas fa-check-circle text-success mt-1 me-3"></i>
+
+                            <div>
+                                <strong>Unique Department</strong>
+                                <p class="text-muted small mb-0">
+                                    Each department must have a unique name and code.
+                                </p>
+                            </div>
+
+                        </div>
+
+
+                        <div class="d-flex mb-3">
+
+                            <i class="fas fa-user-tie text-info mt-1 me-3"></i>
+
+                            <div>
+                                <strong>Assign Manager</strong>
+                                <p class="text-muted small mb-0">
+                                    Assign an active WorkSphere user as the department manager.
+                                </p>
+                            </div>
+
+                        </div>
+
+
+                        <div class="d-flex">
+
+                            <i class="fas fa-toggle-on text-primary mt-1 me-3"></i>
+
+                            <div>
+                                <strong>Department Status</strong>
+                                <p class="text-muted small mb-0">
+                                    Departments can be activated or deactivated when required.
+                                </p>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            {% if department %}
+
+                <div class="card border-0 shadow-sm">
+
+                    <div class="card-body">
+
+                        <h6 class="fw-bold mb-3">
+                            Department Details
+                        </h6>
+
+                        <div class="small text-muted">
+
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Created</span>
+                                <strong class="text-dark">
+                                    {{ department.created_at|date:"d M Y" }}
+                                </strong>
+                            </div>
+
+                            <div class="d-flex justify-content-between">
+                                <span>Last Updated</span>
+                                <strong class="text-dark">
+                                    {{ department.updated_at|date:"d M Y" }}
+                                </strong>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

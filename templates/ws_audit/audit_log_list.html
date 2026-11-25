@@ -1,0 +1,341 @@
+
+{% extends "base.html" %}
+
+{% block title %}Audit Logs | WorkSphere{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid py-4">
+
+    <!-- PAGE HEADER -->
+
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+
+        <div>
+            <h2 class="fw-bold mb-1">
+                <i class="fa-solid fa-shield-halved text-primary me-2"></i>
+                Audit Logs
+            </h2>
+
+            <p class="text-muted mb-0">
+                Monitor recorded WorkSphere activity and request history.
+            </p>
+        </div>
+
+        <span class="badge bg-light text-dark border px-3 py-2">
+            <i class="fa-solid fa-lock me-1"></i>
+            Administrator Access
+        </span>
+
+    </div>
+
+    <!-- STATISTICS -->
+
+    <div class="row g-3 mb-4">
+
+        <div class="col-md-6 col-xl-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body p-4">
+                    <small class="text-muted">Total Logs</small>
+                    <h3 class="fw-bold mt-2 mb-0">
+                        {{ total_logs }}
+                    </h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-xl-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body p-4">
+                    <small class="text-muted">Successful Responses</small>
+                    <h3 class="fw-bold text-success mt-2 mb-0">
+                        {{ successful_logs }}
+                    </h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-xl-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body p-4">
+                    <small class="text-muted">Client Errors</small>
+                    <h3 class="fw-bold text-warning mt-2 mb-0">
+                        {{ client_error_logs }}
+                    </h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-xl-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body p-4">
+                    <small class="text-muted">Server Errors</small>
+                    <h3 class="fw-bold text-danger mt-2 mb-0">
+                        {{ server_error_logs }}
+                    </h3>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- FILTERS -->
+
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body p-4">
+
+            <form method="get" class="row g-3 align-items-end">
+
+                <div class="col-lg-5">
+                    <label for="search" class="form-label fw-semibold">
+                        Search Logs
+                    </label>
+
+                    <input
+                        type="search"
+                        name="search"
+                        id="search"
+                        value="{{ search_query }}"
+                        class="form-control"
+                        placeholder="Username, action, path, IP address..."
+                    >
+                </div>
+
+                <div class="col-lg-3">
+                    <label for="action" class="form-label fw-semibold">
+                        Action
+                    </label>
+
+                    <select name="action" id="action" class="form-select">
+                        <option value="">All Actions</option>
+
+                        {% for action in available_actions %}
+                        <option
+                            value="{{ action }}"
+                            {% if action_filter == action %}selected{% endif %}
+                        >
+                            {{ action }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="col-lg-2">
+                    <label for="status" class="form-label fw-semibold">
+                        HTTP Status
+                    </label>
+
+                    <input
+                        type="number"
+                        name="status"
+                        id="status"
+                        min="100"
+                        max="599"
+                        value="{{ status_filter }}"
+                        class="form-control"
+                        placeholder="e.g. 403"
+                    >
+                </div>
+
+                <div class="col-lg-2">
+                    <div class="d-flex gap-2">
+
+                        <button type="submit"
+                                class="btn btn-primary flex-fill">
+                            <i class="fa-solid fa-filter me-1"></i>
+                            Filter
+                        </button>
+
+                        <a href="{% url 'audit_log_list' %}"
+                           class="btn btn-outline-secondary"
+                           title="Reset filters">
+                            <i class="fa-solid fa-rotate-left"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+
+    <!-- AUDIT LOG TABLE -->
+
+    <div class="card border-0 shadow-sm">
+
+        <div class="card-header bg-white py-3">
+
+            <h5 class="fw-bold mb-0">
+                <i class="fa-solid fa-list text-primary me-2"></i>
+                Activity History
+            </h5>
+
+        </div>
+
+        <div class="card-body p-0">
+
+            <div class="table-responsive">
+
+                <table class="table table-hover align-middle mb-0">
+
+                    <thead class="table-light">
+                        <tr>
+                            <th class="px-4 py-3">Date & Time</th>
+                            <th>User</th>
+                            <th>Action</th>
+                            <th>Request Path</th>
+                            <th>IP Address</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        {% for log in logs %}
+
+                        <tr>
+
+                            <td class="px-4 text-nowrap">
+                                {{ log.created_at|date:"d M Y" }}
+                                <small class="text-muted d-block">
+                                    {{ log.created_at|date:"h:i:s A" }}
+                                </small>
+                            </td>
+
+                            <td>
+                                {% if log.user %}
+                                    <span class="fw-semibold">
+                                        {{ log.user.username }}
+                                    </span>
+                                {% else %}
+                                    <span class="text-muted">
+                                        Anonymous / Deleted User
+                                    </span>
+                                {% endif %}
+                            </td>
+
+                            <td>
+                                <span class="fw-semibold">
+                                    {{ log.action }}
+                                </span>
+
+                                {% if log.description %}
+                                <small class="text-muted d-block">
+                                    {{ log.description|truncatechars:90 }}
+                                </small>
+                                {% endif %}
+                            </td>
+
+                            <td>
+                                <code class="text-break">
+                                    {{ log.request_path }}
+                                </code>
+                            </td>
+
+                            <td>
+                                {{ log.ip_address|default:"—" }}
+                            </td>
+
+                            <td>
+                                {% if log.status_code >= 500 %}
+                                    <span class="badge bg-danger">
+                                        {{ log.status_code }}
+                                    </span>
+                                {% elif log.status_code >= 400 %}
+                                    <span class="badge bg-warning text-dark">
+                                        {{ log.status_code }}
+                                    </span>
+                                {% elif log.status_code >= 200 and log.status_code < 400 %}
+                                    <span class="badge bg-success">
+                                        {{ log.status_code }}
+                                    </span>
+                                {% else %}
+                                    <span class="badge bg-secondary">
+                                        {{ log.status_code|default:"—" }}
+                                    </span>
+                                {% endif %}
+                            </td>
+
+                        </tr>
+
+                        {% empty %}
+
+                        <tr>
+                            <td colspan="6" class="text-center py-5">
+
+                                <i class="fa-solid fa-clipboard-list text-muted fs-2 mb-3"></i>
+
+                                <h5 class="fw-bold">
+                                    No Audit Logs Found
+                                </h5>
+
+                                <p class="text-muted mb-0">
+                                    No recorded activity matches your filters.
+                                </p>
+
+                            </td>
+                        </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+        <!-- PAGINATION -->
+
+        {% if page_obj.has_other_pages %}
+
+        <div class="card-footer bg-white py-3">
+
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+
+                <span class="text-muted small">
+                    Page {{ page_obj.number }}
+                    of {{ page_obj.paginator.num_pages }}
+                </span>
+
+                <div class="d-flex gap-2">
+
+                    {% if page_obj.has_previous %}
+                    <a
+                        class="btn btn-sm btn-outline-primary"
+                        href="?page={{ page_obj.previous_page_number }}&search={{ search_query|urlencode }}&action={{ action_filter|urlencode }}&status={{ status_filter|urlencode }}"
+                    >
+                        Previous
+                    </a>
+                    {% endif %}
+
+                    {% if page_obj.has_next %}
+                    <a
+                        class="btn btn-sm btn-outline-primary"
+                        href="?page={{ page_obj.next_page_number }}&search={{ search_query|urlencode }}&action={{ action_filter|urlencode }}&status={{ status_filter|urlencode }}"
+                    >
+                        Next
+                    </a>
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+        </div>
+
+        {% endif %}
+
+    </div>
+
+    <p class="text-muted small mt-3">
+        <i class="fa-solid fa-circle-info me-1"></i>
+        This page displays recorded audit events.
+        It does not modify or delete log records.
+    </p>
+
+</div>
+
+{% endblock %}

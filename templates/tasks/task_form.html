@@ -1,0 +1,464 @@
+
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container-fluid py-4">
+
+    <!-- PAGE HEADER -->
+    <div class="mb-4">
+
+        <a href="{% url 'task_list' %}"
+           class="text-decoration-none text-muted">
+            <i class="fas fa-arrow-left me-2"></i>
+            Back to Tasks
+        </a>
+
+        <h1 class="fw-bold mt-3 mb-1">
+            {{ page_title }}
+        </h1>
+
+        <p class="text-muted mb-0">
+            {% if page_title == "Create Task" %}
+                Create a new task and assign it to a project member.
+            {% else %}
+                Update the task information and assignment.
+            {% endif %}
+        </p>
+
+    </div>
+
+    <div class="row g-4">
+
+        <!-- MAIN TASK FORM -->
+        <div class="col-lg-8">
+
+            <div class="card border-0 shadow-sm">
+
+                <div class="card-body p-4">
+
+                    <form method="POST" novalidate>
+
+                        {% csrf_token %}
+
+                        <!-- FORM ERRORS -->
+                        {% if form.non_field_errors %}
+                            <div class="alert alert-danger">
+                                {{ form.non_field_errors }}
+                            </div>
+                        {% endif %}
+
+                        <!-- TASK TITLE -->
+                        <div class="mb-4">
+
+                            <label for="{{ form.title.id_for_label }}"
+                                   class="form-label fw-semibold">
+                                Task Title
+                                <span class="text-danger">*</span>
+                            </label>
+
+                            {{ form.title }}
+
+                            {% for error in form.title.errors %}
+                                <div class="text-danger small mt-2">
+                                    {{ error }}
+                                </div>
+                            {% endfor %}
+
+                        </div>
+
+                        <!-- DESCRIPTION -->
+                        <div class="mb-4">
+
+                            <label for="{{ form.description.id_for_label }}"
+                                   class="form-label fw-semibold">
+                                Description
+                            </label>
+
+                            {{ form.description }}
+
+                            {% for error in form.description.errors %}
+                                <div class="text-danger small mt-2">
+                                    {{ error }}
+                                </div>
+                            {% endfor %}
+
+                        </div>
+
+                        <!-- PROJECT -->
+                        <div class="mb-4">
+
+                            <label for="{{ form.project.id_for_label }}"
+                                   class="form-label fw-semibold">
+                                Project
+                                <span class="text-danger">*</span>
+                            </label>
+
+                            {{ form.project }}
+
+                            {% for error in form.project.errors %}
+                                <div class="text-danger small mt-2">
+                                    {{ error }}
+                                </div>
+                            {% endfor %}
+
+                            <small class="text-muted">
+                                Select a project to load its Employees.
+                            </small>
+
+                        </div>
+
+                        <div class="row">
+
+                            <!-- ASSIGNED TO -->
+                            <div class="col-md-6 mb-4">
+
+                                <label for="{{ form.assigned_to.id_for_label }}"
+                                       class="form-label fw-semibold">
+                                    Assigned To
+                                </label>
+
+                                {{ form.assigned_to }}
+
+                                <div id="employee-help"
+                                     class="form-text">
+                                    Select a project first.
+                                </div>
+
+                                {% for error in form.assigned_to.errors %}
+                                    <div class="text-danger small mt-2">
+                                        {{ error }}
+                                    </div>
+                                {% endfor %}
+
+                            </div>
+
+                            <!-- PRIORITY -->
+                            <div class="col-md-6 mb-4">
+
+                                <label for="{{ form.priority.id_for_label }}"
+                                       class="form-label fw-semibold">
+                                    Priority
+                                </label>
+
+                                {{ form.priority }}
+
+                                {% for error in form.priority.errors %}
+                                    <div class="text-danger small mt-2">
+                                        {{ error }}
+                                    </div>
+                                {% endfor %}
+
+                            </div>
+
+                        </div>
+
+                        <div class="row">
+
+                            <!-- STATUS -->
+                            <div class="col-md-6 mb-4">
+
+                                <label for="{{ form.status.id_for_label }}"
+                                       class="form-label fw-semibold">
+                                    Status
+                                </label>
+
+                                {{ form.status }}
+
+                                {% for error in form.status.errors %}
+                                    <div class="text-danger small mt-2">
+                                        {{ error }}
+                                    </div>
+                                {% endfor %}
+
+                            </div>
+
+                            <!-- DUE DATE -->
+                            <div class="col-md-6 mb-4">
+
+                                <label for="{{ form.due_date.id_for_label }}"
+                                       class="form-label fw-semibold">
+                                    Due Date
+                                </label>
+
+                                {{ form.due_date }}
+
+                                {% for error in form.due_date.errors %}
+                                    <div class="text-danger small mt-2">
+                                        {{ error }}
+                                    </div>
+                                {% endfor %}
+
+                            </div>
+
+                        </div>
+
+                        <!-- BUTTONS -->
+                        <div class="d-flex flex-wrap gap-2 pt-2">
+
+                            <button type="submit"
+                                    class="btn btn-primary px-4">
+
+                                {% if page_title == "Create Task" %}
+                                    <i class="fas fa-plus me-2"></i>
+                                    Create Task
+                                {% else %}
+                                    <i class="fas fa-save me-2"></i>
+                                    Save Changes
+                                {% endif %}
+
+                            </button>
+
+                            <a href="{% url 'task_list' %}"
+                               class="btn btn-outline-secondary px-4">
+                                Cancel
+                            </a>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- INFORMATION CARD -->
+        <div class="col-lg-4">
+
+            <div class="card border-0 shadow-sm">
+
+                <div class="card-body p-4">
+
+                    <h5 class="fw-bold mb-3">
+                        <i class="fas fa-info-circle text-primary me-2"></i>
+                        Task Guidelines
+                    </h5>
+
+                    <div class="mb-3">
+
+                        <strong class="d-block mb-1">
+                            Task Title
+                        </strong>
+
+                        <small class="text-muted">
+                            Use a short and clear title
+                            that describes the work.
+                        </small>
+
+                    </div>
+
+                    <div class="mb-3">
+
+                        <strong class="d-block mb-1">
+                            Assignment
+                        </strong>
+
+                        <small class="text-muted">
+                            Select a project first.
+                            Then choose an available Employee.
+                        </small>
+
+                    </div>
+
+                    <div class="mb-3">
+
+                        <strong class="d-block mb-1">
+                            Priority
+                        </strong>
+
+                        <small class="text-muted">
+                            Set the priority according
+                            to task importance.
+                        </small>
+
+                    </div>
+
+                    <div>
+
+                        <strong class="d-block mb-1">
+                            Due Date
+                        </strong>
+
+                        <small class="text-muted">
+                            Set a deadline to track
+                            project progress.
+                        </small>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- DYNAMIC EMPLOYEE LOADING -->
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const projectSelect =
+        document.getElementById("id_project");
+
+    const employeeSelect =
+        document.getElementById("id_assigned_to");
+
+    const employeeHelp =
+        document.getElementById("employee-help");
+
+    if (!projectSelect || !employeeSelect) {
+        console.error("Task form dropdowns not found.");
+        return;
+    }
+
+    // Keep existing assignment when editing a task.
+    const initialEmployee = employeeSelect.value;
+
+    // Prevent old requests from overwriting new selections.
+    let requestNumber = 0;
+
+    async function loadEmployees(keepSelection = false) {
+
+        const currentRequest = ++requestNumber;
+        const projectId = projectSelect.value;
+
+        employeeSelect.innerHTML = "";
+
+        employeeSelect.add(
+            new Option("Select Employee", "")
+        );
+
+        employeeSelect.disabled = true;
+
+        if (!projectId) {
+            if (employeeHelp) {
+                employeeHelp.textContent =
+                    "Please select a project first.";
+            }
+            return;
+        }
+
+        if (employeeHelp) {
+            employeeHelp.textContent =
+                "Loading Employees...";
+        }
+
+        try {
+
+            const url =
+                "{% url 'project_employees' %}" +
+                "?project_id=" +
+                encodeURIComponent(projectId);
+
+            const response = await fetch(url, {
+                method: "GET",
+                credentials: "same-origin",
+                headers: {
+                    "X-Requested-With": "XMLHttpRequest"
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error(
+                    "HTTP error: " + response.status
+                );
+            }
+
+            const data = await response.json();
+
+            if (currentRequest !== requestNumber) {
+                return;
+            }
+
+            const employees = Array.isArray(data.employees)
+                ? data.employees
+                : [];
+
+            employees.forEach(function (employee) {
+
+                const option = new Option(
+                    employee.username,
+                    String(employee.id)
+                );
+
+                employeeSelect.add(option);
+
+            });
+
+            if (keepSelection && initialEmployee) {
+
+                const selectedExists = employees.some(
+                    function (employee) {
+                        return String(employee.id) ===
+                            String(initialEmployee);
+                    }
+                );
+
+                if (selectedExists) {
+                    employeeSelect.value =
+                        String(initialEmployee);
+                }
+            }
+
+            // Enable dropdown after successful loading.
+            employeeSelect.disabled = false;
+
+            if (employeeHelp) {
+
+                if (employees.length === 0) {
+                    employeeHelp.textContent =
+                        "No eligible Employees found for this project.";
+                } else {
+                    employeeHelp.textContent =
+                        employees.length +
+                        " Employee(s) available for assignment.";
+                }
+
+            }
+
+        } catch (error) {
+
+            if (currentRequest !== requestNumber) {
+                return;
+            }
+
+            console.error(
+                "Employee loading failed:",
+                error
+            );
+
+            employeeSelect.disabled = true;
+
+            if (employeeHelp) {
+                employeeHelp.textContent =
+                    "Unable to load Employees. Please refresh and try again.";
+            }
+
+        }
+
+    }
+
+    // Update Employees whenever Project changes.
+    projectSelect.addEventListener(
+        "change",
+        function () {
+            loadEmployees(false);
+        }
+    );
+
+    // Load existing Employees when editing a task.
+    if (projectSelect.value) {
+        loadEmployees(true);
+    } else {
+        employeeSelect.disabled = true;
+    }
+
+});
+</script>
+
+{% endblock %}
